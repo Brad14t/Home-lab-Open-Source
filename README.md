@@ -75,8 +75,14 @@ This project documents the complete build and operation of an enterprise-grade c
 | **Scripting/Automation** | Python, Bash, PowerShell |
 
 
+## 📋 Project Phases
 
-
+**Phase 1: Foundation & Network Infrastructure**
+- [x] Proxmox VE installation and configuration
+- [x] Network planning and VLAN design
+- [ ] pfSense installation and VLAN configuration
+- [ ] DNS and DHCP setup
+- [ ] Network documentation
 
 
 

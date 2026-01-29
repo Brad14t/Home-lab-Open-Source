@@ -20,3 +20,14 @@ This project documents the complete build and operation of an enterprise-grade c
 
 <img width="385" height="173" alt="image" src="https://github.com/user-attachments/assets/687df5b8-ed67-442b-9be8-f67c8fa64855" />
 
+# Infrastructure Components 
+
+**Security Monitoring & SIEM (VLAN 20)**
+
+- **Wazuh** - Open-source SIEM and XDR platform
+- **Splunk** - Log aggregation and analysis (Free license: 500MB/day)
+- **TheHive** - Incident response platform
+- **Cortex** - Observable analysis and active response engine
+- **Security Onion** - Network security monitoring
+- **Elastic Stack (ELK)** - Log management integrated with Wazuh
+

@@ -174,14 +174,76 @@ All VLAN Traffic
                               └──> PCAP Storage
 ```
 
+# DNS Configuration
 
+## Internal DNS (pfSense)
 
+**Forward Lookup Zones**
+```
+lab.local               - Primary internal domain
+security.lab.local      - Security tools subdomain
+corp.lab.local          - Corporate network subdomain
+vulnerable.lab.local    - Vulnerable apps subdomain
+```
 
+**Key DNS Records**
+```
+wazuh.security.lab.local        -> 10.0.20.10
+splunk.security.lab.local       -> 10.0.20.20
+thehive.security.lab.local      -> 10.0.20.30
+dc01.corp.lab.local             -> 10.0.30.10
+dc02.corp.lab.local             -> 10.0.30.11
+dvwa.vulnerable.lab.local       -> 10.0.40.10
+kali.attacker.lab.local         -> 10.0.50.10
+```
 
+# Proxmox Network Configuration
 
+## Virtual Bridge Setup
 
+```bash
+# Create Linux Bridges for each VLAN
+auto vmbr0
+iface vmbr0 inet static
+    address 10.0.10.2/24
+    gateway 10.0.10.1
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    # Management VLAN
 
+auto vmbr10
+iface vmbr10 inet manual
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    # Security Tools VLAN
 
+auto vmbr20
+iface vmbr20 inet manual
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    # Corporate VLAN
+
+auto vmbr30
+iface vmbr30 inet manual
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    # Vulnerable Apps VLAN
+
+auto vmbr40
+iface vmbr40 inet manual
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    # Attacker Network VLAN
+```
 
 
 

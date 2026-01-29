@@ -18,13 +18,5 @@ This project documents the complete build and operation of an enterprise-grade c
 
 # Network Topology
 
-Internet
-    │
-    ├── pfSense Firewall (10.0.0.1)
-    │       │
-    │       ├── VLAN 10: Management (10.0.10.0/24)
-    │       ├── VLAN 20: Security Tools (10.0.20.0/24)
-    │       ├── VLAN 30: Corporate Network (10.0.30.0/24)
-    │       ├── VLAN 40: Vulnerable Apps (10.0.40.0/24)
-    │       └── VLAN 50: Attacker Network (10.0.50.0/24)
+<img width="385" height="173" alt="image" src="https://github.com/user-attachments/assets/687df5b8-ed67-442b-9be8-f67c8fa64855" />
 

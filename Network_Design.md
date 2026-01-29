@@ -108,18 +108,71 @@ Priority 2: Allow access to all VLANs
 Priority 3: Log all traffic
 ```
 
+**Security Tools VLAN**
+```
+Priority 1: Allow inbound from all VLANs (for log collection)
+Priority 2: Allow outbound to all VLANs (for monitoring)
+Priority 3: Allow Internet access (updates, threat intel)
+Priority 4: Log all traffic
+```
 
+**Corporate VLAN**
+```
+Priority 1: Allow outbound to Internet
+Priority 2: Allow to Security Tools (log shipping)
+Priority 3: Allow intra-VLAN communication
+Priority 4: DENY to Vulnerable Apps
+Priority 5: DENY to Attacker Network
+Priority 6: Log all traffic
+```
 
+**Vulnerable Apps VLAN**
+```
+Priority 1: Allow to Security Tools (logging only)
+Priority 2: DENY to all other VLANs
+Priority 3: DENY Internet access
+Priority 4: Log all traffic
+```
 
+**Attacker Network VLAN**
+```
+Priority 1: Allow to Vulnerable Apps
+Priority 2: CONTROLLED access to Corporate (requires manual enable)
+Priority 3: DENY to Security Tools
+Priority 4: Allow Internet (for tool updates)
+Priority 5: Log all traffic
+```
 
+# Traffic Flow & Monitoring
 
+## Log Flow Architecture
 
+```
+Endpoints (All VLANs)
+    │
+    ├──> Wazuh Agents ──> Wazuh Manager (10.0.20.10)
+    │                          │
+    │                          ├──> Wazuh Indexer (10.0.20.11)
+    │                          └──> TheHive (10.0.20.30)
+    │
+    ├──> Syslog ──> Splunk (10.0.20.20)
+    │
+    └──> Windows Event Forwarding ──> Splunk / Wazuh
+```
 
+## Network Traffic Monitoring
 
-
-
-
-
+```
+All VLAN Traffic
+    │
+    ├──> pfSense (Suricata IDS) ──> Logs to Security Onion
+    │
+    └──> Mirror Port ──> Security Onion (10.0.20.40)
+                              │
+                              ├──> Zeek (Network Analysis)
+                              ├──> Suricata (IDS/IPS)
+                              └──> PCAP Storage
+```
 
 
 

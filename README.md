@@ -57,7 +57,7 @@ This project documents the complete build and operation of an enterprise-grade c
 - **Docker Host** - Container services (Portainer for management)
 - **Ubuntu Server** - General-purpose server hosting
 
-## 🛠️ Technology Stack
+# 🛠️ Technology Stack
 
 | Category | Tools |
 |----------|-------|
@@ -75,30 +75,94 @@ This project documents the complete build and operation of an enterprise-grade c
 | **Scripting/Automation** | Python, Bash, PowerShell |
 
 
-## 📋 Project Phases
+# 📋 Project Phases
 
 **Phase 1: Foundation & Network Infrastructure**
-- [x] Proxmox VE installation and configuration
-- [x] Network planning and VLAN design
+- [ ] Proxmox VE installation and configuration
+- [ ] Network planning and VLAN design
 - [ ] pfSense installation and VLAN configuration
 - [ ] DNS and DHCP setup
 - [ ] Network documentation
 
+**Phase 2: Security Monitoring Infrastructure**
+- [ ] Wazuh server deployment
+- [ ] Splunk deployment (500MB/day free tier)
+- [ ] TheHive + Cortex integration
+- [ ] Security Onion deployment
+- [ ] Log collection architecture
+
+**Phase 3: Active Directory Environment**
+- [ ] Windows Server deployment (DC1 and DC2)
+- [ ] Active Directory forest configuration
+- [ ] Group Policy Objects (GPOs)
+- [ ] User and computer management
+- [ ] Windows workstation deployment and domain join
+
+**Phase 4: Endpoint Monitoring**
+- [ ] Wazuh agent deployment to all endpoints
+- [ ] Sysmon installation and configuration
+- [ ] Log forwarding to SIEM platforms
+- [ ] Baseline monitoring dashboards
+
+**Phase 5: Vulnerable Application Environment**
+- [ ] DVWA deployment
+- [ ] bWAPP deployment
+- [ ] Metasploitable setup
+- [ ] Network isolation and access controls
+
+**Phase 6: Attack Infrastructure**
+- [ ] Kali Linux setup
+- [ ] Nessus Essentials installation
+- [ ] Caldera deployment and configuration
+- [ ] Attack simulation planning
+
+**Phase 7: Detection & Response**
+- [ ] MITRE ATT&CK mapping
+- [ ] Detection rule development
+- [ ] Incident response playbooks
+- [ ] Purple team exercises
+
+**Phase 8: Automation & Documentation**
+- [ ] Automated alert workflows
+- [ ] Response automation scripts
+- [ ] Complete documentation
+- [ ] Portfolio presentation
 
 
+# 🎓 Skills Demonstrated
+
+- **SIEM Management**: Multi-platform log aggregation, correlation, and analysis
+- **Threat Detection**: Creating and tuning detection rules based on MITRE ATT&CK
+- **Incident Response**: Using TheHive for case management and investigation
+- **Network Security**: Firewall configuration, IDS/IPS implementation
+- **Vulnerability Management**: Scanning, assessment, and remediation
+- **Active Directory**: Enterprise domain management and security
+- **Endpoint Security**: EDR deployment and monitoring
+- **Security Automation**: Integration of security tools and automated responses
+- **Purple Teaming**: Coordinated attack simulation and defense validation
+- **Technical Documentation**: Professional lab documentation for stakeholders
+
+# 🔗 Key Resources
+
+- **MITRE ATT&CK Framework**: https://attack.mitre.org/
+- **Wazuh Documentation**: https://documentation.wazuh.com/
+- **Splunk Free**: https://www.splunk.com/en_us/download/splunk-enterprise.html
+- **TheHive Project**: https://thehive-project.org/
+- **Security Onion**: https://securityonionsolutions.com/
+- **Caldera**: https://github.com/mitre/caldera
 
 
+# 📝 Important Notes
+
+- **Cost**: $0 - All tools use free/open-source versions or evaluation licenses
+- **Legal**: This lab is for educational purposes in an isolated environment
+- **Scalability**: Start with core components, add complexity gradually
+- **Documentation**: Each phase includes detailed screenshots and configurations
 
 
+# 🤝 Connect
 
-
-
-
-
-
-
-
-
+This project is part of my cybersecurity portfolio demonstrating hands-on blue team capabilities. I'm actively seeking opportunities in SOC, Threat Detection, Incident Response, and Security Engineering roles.
 
 
 

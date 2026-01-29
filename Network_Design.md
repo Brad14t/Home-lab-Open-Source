@@ -97,9 +97,16 @@ This document details the complete network architecture for the Ultimate Blue Te
 | Attacker | Vulnerable Apps | ALLOW | Attack simulation |
 | Attacker | Security Tools | DENY | Cannot attack monitoring |
 
+# pfSense Firewall Configuration
 
+**Default Rules by VLAN**
 
-
+**Management VLAN**
+```
+Priority 1: Allow all outbound
+Priority 2: Allow access to all VLANs
+Priority 3: Log all traffic
+```
 
 
 

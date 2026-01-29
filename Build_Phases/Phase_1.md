@@ -2,11 +2,11 @@
 
 # Pre-Build Checklist
 
-- [ ] Proxmox VE installed and updated
-- [ ] At least 64GB RAM available
-- [ ] 500GB+ storage available
-- [ ] Network connectivity to Proxmox host
-- [ ] ISO files downloaded (see ISO Download List below)
+- [x] Proxmox VE installed and updated
+- [x] At least 64GB RAM available
+- [x] 500GB+ storage available
+- [x] Network connectivity to Proxmox host
+- [x] ISO files downloaded (see ISO Download List below)
 
 
 # ISO Download List

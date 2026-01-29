@@ -33,6 +33,198 @@ This document details the complete network architecture for the Ultimate Blue Te
 10.0.10.10-20   - Reserved for infrastructure
 ```
 
+**VLAN 10 - Security Tools (10.0.20.0/24)**
+
+```
+10.0.20.1       - Gateway (pfSense)
+10.0.20.10      - Wazuh Manager
+10.0.20.11      - Wazuh Indexer
+10.0.20.12      - Wazuh Dashboard
+10.0.20.20      - Splunk Enterprise
+10.0.20.30      - TheHive
+10.0.20.31      - Cortex
+10.0.20.40      - Security Onion
+10.0.20.50      - Docker Host (Portainer)
+10.0.20.100-200 - DHCP Pool for additional security tools
+```
+
+**VLAN 20 - Corporate Network (10.0.30.0/24)**
+
+```
+10.0.30.1       - Gateway (pfSense)
+10.0.30.10      - DC01 (Primary Domain Controller)
+10.0.30.11      - DC02 (Secondary Domain Controller)
+10.0.30.20      - File Server
+10.0.30.30      - Ubuntu Server (internal services)
+10.0.30.100-200 - DHCP Pool for workstations
+```
+
+**VLAN 30 - Vulnerable Apps (10.0.40.0/24)**
+
+```
+10.0.40.1       - Gateway (pfSense)
+10.0.40.10      - DVWA
+10.0.40.11      - bWAPP
+10.0.40.12      - Metasploitable 2
+10.0.40.13      - Metasploitable 3
+10.0.40.20-50   - VulnHub VMs
+```
+
+**VLAN 40 - Attacker Network (10.0.50.0/24)**
+
+```
+10.0.50.1       - Gateway (pfSense)
+10.0.50.10      - Kali Linux (Primary)
+10.0.50.20      - Nessus Scanner
+10.0.50.30      - Caldera Server
+10.0.50.40      - Ubuntu Attack Box
+```
+
+# Firewall Rules & Network Policies
+
+| Source VLAN | Destination VLAN | Access | Purpose |
+|-------------|------------------|--------|---------|
+| Management | All | ALLOW | Admin access to all systems |
+| Security Tools | Corporate | ALLOW | Log collection, monitoring |
+| Security Tools | Vulnerable Apps | ALLOW | Monitor vulnerable systems |
+| Security Tools | Attacker | ALLOW | Monitor attack traffic |
+| Corporate | Security Tools | ALLOW | Send logs to SIEM |
+| Corporate | Internet | ALLOW | Normal business operations |
+| Vulnerable Apps | Corporate | DENY | Prevent lateral movement |
+| Vulnerable Apps | Security Tools | ALLOW | Send logs only |
+| Vulnerable Apps | Internet | DENY | Isolation |
+| Attacker | Corporate | CONTROLLED | Purple team exercises only |
+| Attacker | Vulnerable Apps | ALLOW | Attack simulation |
+| Attacker | Security Tools | DENY | Cannot attack monitoring |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -245,19 +245,44 @@ iface vmbr40 inet manual
     # Attacker Network VLAN
 ```
 
+# Security Considerations
+
+## Network Segmentation Benefits
+- **Containment**: Compromised vulnerable apps cannot reach corporate network
+- **Monitoring**: All traffic flows through chokepoints
+- **Compliance**: Demonstrates defense-in-depth architecture
+- **Flexibility**: Easy to add/remove systems per VLAN
+
+## IDS/IPS Placement
+- **pfSense Suricata**: Inline on all VLAN interfaces
+- **Security Onion**: Passive monitoring via port mirroring
+- **Coverage**: 100% of inter-VLAN traffic monitored
+
+## Lab Safety Measures
+1. **Isolation**: No production systems in lab environment
+2. **Access Control**: Management VLAN requires authentication
+3. **Monitoring**: All attack activity logged and alerted
+4. **Snapshots**: Regular Proxmox snapshots before testing
+5. **Kill Switch**: Ability to instantly isolate attacker VLAN
+
+# Minimum Resources
+
+| System Type | CPU | RAM | Storage | VLAN |
+|-------------|-----|-----|---------|------|
+| pfSense | 2 cores | 2GB | 20GB | All |
+| Wazuh Manager | 4 cores | 8GB | 100GB | VLAN 10 |
+| Splunk | 4 cores | 8GB | 100GB | VLAN 10 |
+| Security Onion | 4 cores | 16GB | 200GB | VLAN 10 |
+| Domain Controller | 2 cores | 4GB | 60GB | VLAN 20 |
+| Windows 10/11 | 2 cores | 4GB | 60GB | VLAN 20 |
+| DVWA/bWAPP | 1 core | 1GB | 20GB | VLAN 30 |
+| Kali Linux | 2 cores | 4GB | 80GB | VLAN 40 |
 
 
-
-
-
-
-
-
-
-
-
-
-
+**Total Lab Requirements**
+- **CPU**: 32+ cores (recommend 48-64)
+- **RAM**: 64GB minimum (recommend 96-128GB)
+- **Storage**: 1TB minimum (recommend 2TB SSD)
 
 
 

@@ -23,11 +23,15 @@ This document details the complete network architecture for the Ultimate Blue Te
 | 40 | Attacker Network | 10.0.50.0/24 | 10.0.50.1 | Kali, Nessus, attack simulation tools |
 | 99 | WAN/Internet | DHCP | - | External connectivity (optional) |
 
+# Detailed IP Allocation
 
+**VLAN 1 - Management (10.0.10.0/24)**
 
-
-
-
+```
+10.0.10.1       - pfSense Management Interface
+10.0.10.2       - Proxmox Host
+10.0.10.10-20   - Reserved for infrastructure
+```
 
 
 

@@ -30,9 +30,9 @@ I start by downloading these ISOs and upload to Proxmox before starting:
 - Metasploitable 2: https://sourceforge.net/projects/metasploitable/
 ```
 
+# Step 1: Proxmox Network Configuration
 
-
-
+## 1.1 Creating Virtual Bridges
 
 
 

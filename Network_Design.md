@@ -99,7 +99,7 @@ This document details the complete network architecture for the Ultimate Blue Te
 
 # pfSense Firewall Configuration
 
-**Default Rules by VLAN**
+## Default Rules by VLAN
 
 **Management VLAN**
 ```

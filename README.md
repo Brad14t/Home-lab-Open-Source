@@ -31,3 +31,126 @@ This project documents the complete build and operation of an enterprise-grade c
 - **Security Onion** - Network security monitoring
 - **Elastic Stack (ELK)** - Log management integrated with Wazuh
 
+**Endpoint Systems (VLAN 30)**
+
+- **Active Directory Server** - Windows Server 2019/2022 (Evaluation)
+- **Domain Controllers** - Primary and backup DC
+- **Windows 10/11 Workstations** - Corporate endpoints (Evaluation)
+- **Ubuntu Desktop** - Linux workstation endpoint
+
+**Vulnerable Applications (VLAN 40)**
+
+- **DVWA** - Damn Vulnerable Web Application
+- **bWAPP** - Buggy Web Application
+- **VulnHub VMs** - Various vulnerable systems
+- **Metasploitable** - Intentionally vulnerable Linux VM
+
+**Attack Simulation (VLAN 50)**
+
+- **Kali Linux** - Penetration testing platform
+- **Nessus Essentials** - Vulnerability scanner (Free version)
+- **Caldera** - Adversary emulation platform (MITRE ATT&CK)
+
+**Supporting Infrastructure**
+
+- **pfSense** - Firewall/Router with Suricata IDS
+- **Docker Host** - Container services (Portainer for management)
+- **Ubuntu Server** - General-purpose server hosting
+
+## 🛠️ Technology Stack
+
+| Category | Tools |
+|----------|-------|
+| **Hypervisor** | Proxmox VE |
+| **SIEM/XDR** | Wazuh, Splunk, ELK Stack |
+| **Incident Response** | TheHive, Cortex |
+| **NSM** | Security Onion, Suricata |
+| **Endpoint Detection** | Wazuh Agents, Sysmon |
+| **Vulnerability Scanning** | Nessus Essentials, OpenVAS |
+| **Penetration Testing** | Kali Linux, Metasploit |
+| **Adversary Emulation** | Caldera (MITRE ATT&CK) |
+| **Network Security** | pfSense, Suricata IDS/IPS |
+| **Containerization** | Docker, Portainer |
+| **Directory Services** | Active Directory |
+| **Scripting/Automation** | Python, Bash, PowerShell |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

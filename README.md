@@ -1,6 +1,3 @@
-# Home-lab-NEW
-
-
 # The Ultimate Blue Team Cybersecurity Lab
 
 ![Lab Status](https://img.shields.io/badge/status-in--progress-yellow)

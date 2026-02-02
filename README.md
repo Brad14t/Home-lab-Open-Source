@@ -1,6 +1,6 @@
 # The Ultimate Blue Team Cybersecurity Lab
 
-![Lab Status](https://img.shields.io/badge/status-in--progress-yellow) | ![Platform](https://img.shields.io/badge/platform-Proxmox-orange) | ![Cost](https://img.shields.io/badge/cost-free-green)
+![Lab Status](https://img.shields.io/badge/status-in--progress-yellow)  ![Platform](https://img.shields.io/badge/platform-Proxmox-orange)  ![Cost](https://img.shields.io/badge/cost-free-green)
 
 
 # 🎯 Project Overview

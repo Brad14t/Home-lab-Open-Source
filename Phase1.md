@@ -1,0 +1,52 @@
+# Process
+
+I had started this lab, but need to make changes to it. This will be my process of setting up the lab.
+
+First I use the `Shell` into the proxmox host. Then I run this command to check existing network bridges. 
+`ip addr show | grep vmbr`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -113,7 +113,7 @@ Then select the DHCP range
 
 `ERROR`
 
-My COX router is using `192.168.0.1` so I am going to change pfSense to `192.168.0.254`
+I am going to change pfSense to `192.168.0.254`
 
 <img width="414" height="53" alt="image" src="https://github.com/user-attachments/assets/d255ee27-9ed9-42a6-bc1f-707d054dc4b6" />
 
@@ -209,26 +209,81 @@ Looks like I had to remove the LAN interface and change the WAN to take its plac
 
 <img width="552" height="338" alt="image" src="https://github.com/user-attachments/assets/b423ea60-f183-4d80-8592-3ae6018e6390" />
 
+Went back and deleted test VM.
+
+Next I am going to create my vlan assignments:
+
+<img width="515" height="186" alt="image" src="https://github.com/user-attachments/assets/2dea1864-01a4-44a5-adf0-94a62c320ce7" />
+
+Confirmed within console of pfsense 
+
+<img width="216" height="48" alt="image" src="https://github.com/user-attachments/assets/a6e6f357-ca0d-4ef3-9f3d-d1bbfa840389" />
+
+`ERROR` I couldnt connect back to my pfsense GUI after I saved changes, I ended up finding the fix and added a rule via the shell in pfsense with this command: `easyrule pass wan tcp 192.168.0.234`
+
+Then I set the other vlans:
+
+`LAN` to `10.0.20.1` - `SECURITY`
+
+`OPT1` to `10.0.30.1` - `CORPORATE`
+
+`OPT2` to `10.0.40.1` - `Vulnerable`
+
+`OPT3` to `10.0.50.1` - `ATTACKER`
+
+<img width="575" height="406" alt="image" src="https://github.com/user-attachments/assets/6dbae929-f742-44d1-a811-0d1e75e52d72" />
+
+<img width="546" height="410" alt="image" src="https://github.com/user-attachments/assets/0fce0883-35cb-4a19-b040-6d12f88d5ab6" />
+
+<img width="558" height="400" alt="image" src="https://github.com/user-attachments/assets/b12eb729-bfe0-4608-bb1e-588016d7a7a7" />
+
+`Enabling DHCP`
+
+Within `Security` tab:
+
+I enabled - `Enable DHCP server on SECURITY interface`
+
+Added the address pool range to make room for reservations later - `10.0.20.100` to `10.0.20.200`
 
 
+Within `Corporate` tab:
+
+I enabled - `Enable DHCP server on SECURITY interface`
+
+Added the address pool range to make room for reservations later - `10.0.30.100` to `10.0.30.200`
+
+Within `Vulnerable` tab:
+
+I enabled - `Enable DHCP server on SECURITY interface`
+
+Added the address pool range to make room for reservations later - `10.0.40.100` to `10.0.40.200`
+
+Within `Attacker` tab:
+
+I enabled - `Enable DHCP server on SECURITY interface`
+
+Added the address pool range to make room for reservations later - `10.0.50.100` to `10.0.50.200`
+
+`Firewall rules`
+
+I am isolating vul/attacker vlans from corp vlan.
+
+How I look at it:
+
+`SECURITY` (your tools: Wazuh, Splunk, TheHive) should be able to reach into every other VLAN (monitoring needs visibility everywhere)
+
+`CORPORATE` should NOT be reachable from `VULNERABLE` or `ATTACKER` (this is the "protect the business" zone)
+
+`VULNERABLE` and `ATTACKER` should be able to talk to each other (attacker box attacks vulnerable box)
+
+`VULNERABLE` and `ATTACKER` should NOT be able to reach `CORPORATE` or `SECURITY` except where explicitly needed (e.g., Wazuh agents phoning home to the Wazuh manager on SECURITY)
 
 
+First firewall change I will make is for `Vulnerable` -> action will be `block` -> protocol will be `any` -> source will be `vulnerable subnets` -> destination `corporate subnets` -> description `Block Vulnerabale to Corporate`
 
+Second firewall change I will make is for the `Vulnerable` -> action will be `pass` -> protocol will be `any` -> source will be `vulnerable subnets` -> destination `attacker subnets` -> description `Allow Vulnerable to Attacker`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Third firewall change I will make is for the `Attacker` -> action will be `block` -> protocol will be `any` -> source will be `attacker subnets` -> destination `corporate subnets` -> description `Allow Vulnerable to Attacker`
 
 
 

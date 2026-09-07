@@ -285,15 +285,23 @@ Second firewall change I will make is for the `Vulnerable` -> action will be `pa
 
 Third firewall change I will make is for the `Attacker` -> action will be `block` -> protocol will be `any` -> source will be `attacker subnets` -> destination `corporate subnets` -> description `Allow Vulnerable to Attacker`
 
+# Install and Configure Suricata IDS
 
+Within `pfsense` I went to the `System` tab -> `Package Manager` -> Searched for `Suricata` and installed it.
 
+After installed I go to `Services` -> `Suricata` -> `add`
 
+<img width="461" height="384" alt="image" src="https://github.com/user-attachments/assets/66816446-1f67-48f5-b5af-fc1ec10d7060" />
 
+Confirmed it is running:
 
+<img width="464" height="101" alt="image" src="https://github.com/user-attachments/assets/68c03675-418f-4b61-9937-7d6b1946e938" />
 
+Now to close out phase 1 I will create a snapshot of `pfsense`
 
+<img width="226" height="112" alt="image" src="https://github.com/user-attachments/assets/e1f965bd-075f-4819-badd-0356bd1dee39" />
 
-
+<img width="706" height="187" alt="image" src="https://github.com/user-attachments/assets/d71efcd0-d70f-4ef4-87d9-8f7a000c3ff4" />
 
 
 

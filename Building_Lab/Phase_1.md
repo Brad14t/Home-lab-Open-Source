@@ -303,8 +303,13 @@ Now to close out phase 1 I will create a snapshot of `pfsense`
 
 <img width="706" height="187" alt="image" src="https://github.com/user-attachments/assets/d71efcd0-d70f-4ef4-87d9-8f7a000c3ff4" />
 
+# Additional Storage Needs
 
+At this point I realized that I dont have enough storage within my proxmox machine. I went out and bought a 4tb SSD, and a caddy to hold it physically within the PC. I then mounted the new drive and created it so it can persist through restarts. 
 
+<img width="442" height="55" alt="image" src="https://github.com/user-attachments/assets/67d348d0-303c-4bea-a18b-2e9c0bfadbad" />
+
+# Phase 2 is ready to begin!
 
 
 

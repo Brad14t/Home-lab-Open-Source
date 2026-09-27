@@ -134,6 +134,81 @@ Creating another VM
 
 <img width="364" height="117" alt="image" src="https://github.com/user-attachments/assets/bd8015cc-bf12-4693-88af-09ceaab7709f" />
 
+# Ubuntu Install
+
+<img width="444" height="146" alt="image" src="https://github.com/user-attachments/assets/1dc54337-70a9-4475-80a0-c3af47803ae1" />
+
+<img width="369" height="276" alt="image" src="https://github.com/user-attachments/assets/deb33b54-416e-43ec-9ee8-9896ebcd0c1f" />
+
+<img width="456" height="84" alt="image" src="https://github.com/user-attachments/assets/b21509a8-a524-4034-bab4-7db748fca86f" />
+
+<img width="334" height="153" alt="image" src="https://github.com/user-attachments/assets/3c8dc4a8-fd51-4526-a356-ea2411021293" />
+
+<img width="444" height="178" alt="image" src="https://github.com/user-attachments/assets/fc539f91-a9e6-46e5-86a2-fece94c3a2a7" />
+
+<img width="325" height="222" alt="image" src="https://github.com/user-attachments/assets/8d6ab8ea-9629-4e50-bc99-57a62401b401" />
+
+Edit `ubuntu-lv` to use the full 48 G
+
+<img width="304" height="217" alt="image" src="https://github.com/user-attachments/assets/909fea80-04e4-41d9-9448-62ab29c650f4" />
+
+Created username and password
+
+<img width="455" height="109" alt="image" src="https://github.com/user-attachments/assets/cd7bac75-53f2-40aa-ae97-a17689008a7c" />
+
+<img width="380" height="111" alt="image" src="https://github.com/user-attachments/assets/d50f9ccf-a5f8-4869-b3f3-8bd095e3b2c8" />
+
+<img width="460" height="154" alt="image" src="https://github.com/user-attachments/assets/3a3ed1ad-af48-48ff-8227-019439d1d632" />
+
+Remove the media then reboot
+
+<img width="580" height="298" alt="image" src="https://github.com/user-attachments/assets/eb6bc3c9-bf49-4165-bc0d-d63061dbfcae" />
+
+Now I am logged in and going to check connectivity, I will run: `ping -c 3 10.0.20.1`, `ping -c 3 google.com`
+
+Both were successful 
+
+<img width="307" height="136" alt="image" src="https://github.com/user-attachments/assets/a8b817e4-e666-49fe-93a7-18ce8be8db0b" />
+
+I run `wget -O splunk-10.4.3-4174a2deda5d-linux-amd64.deb "https://download.splunk.com/products/splunk/releases/10.4.3/linux/splunk-10.4.3-4174a2deda5d-linux-amd64.deb"`
+
+<img width="529" height="88" alt="image" src="https://github.com/user-attachments/assets/17f90cb0-b6c6-421b-9c66-b0e5f76f415c" />
+
+The install failed silently (indicted by the empty `/opt`) , so I run `cd ~` then `sudo dpkg -i "splunk-10.4.3-4174a2deda5d-linux-amd64.deb"`
+
+Now that its correctly installed, I run the first setup `sudo /opt/splunk/bin/splunk start --accept-licens`
+
+I cannot boot into web ui, and its because I never added a firewall rule to allow over port 8000
+
+<img width="493" height="437" alt="image" src="https://github.com/user-attachments/assets/32942851-7b23-445b-9fd3-001fb09d4509" />
+
+Now I am in the web ui.
+
+First thing I do is verify the license and hostname, within `Settings` -> `Server Settings`
+
+<img width="520" height="244" alt="image" src="https://github.com/user-attachments/assets/35d6cd4c-fcb2-46da-9329-d07d30e67f48" />
+
+<img width="472" height="58" alt="image" src="https://github.com/user-attachments/assets/46d2cced-9b8d-4ab2-ba6b-95b92a0c19cc" />
+
+<img width="481" height="127" alt="image" src="https://github.com/user-attachments/assets/b0117233-44f7-4278-a09b-ab1daa9997c0" />
+
+Then make sure Splunk is persistent 
+
+I realized I installed splunk into my home directory instead of root, so I switched that over.
+
+Then finished with a snapshot.
+
+<img width="496" height="137" alt="image" src="https://github.com/user-attachments/assets/c6044ad0-5a7c-4eb1-8e03-f48b481e7a69" />
+
+
+
+
+
+
+
+
+
+
 
 
 

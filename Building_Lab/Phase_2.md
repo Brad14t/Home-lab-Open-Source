@@ -200,8 +200,173 @@ Then finished with a snapshot.
 
 <img width="496" height="137" alt="image" src="https://github.com/user-attachments/assets/c6044ad0-5a7c-4eb1-8e03-f48b481e7a69" />
 
+# Cassandra + Elasticsearch VM
 
+Same steps as before, creating a new VM.
 
+<img width="363" height="105" alt="image" src="https://github.com/user-attachments/assets/398aeb7e-c3c0-4dc3-9b3e-8e499bd54a43" />
+
+<img width="354" height="130" alt="image" src="https://github.com/user-attachments/assets/22766483-f711-40ec-b8a1-0d83726bd052" />
+
+<img width="361" height="112" alt="image" src="https://github.com/user-attachments/assets/454662b4-fe06-4cbb-b62b-b7d4f30c2f75" />
+
+<img width="361" height="140" alt="image" src="https://github.com/user-attachments/assets/47239d68-c0ce-4a40-870d-06dc4c519d4a" />
+
+<img width="361" height="81" alt="image" src="https://github.com/user-attachments/assets/0a4d510d-7544-4dbf-810c-a9392e0c2bce" />
+
+<img width="361" height="69" alt="image" src="https://github.com/user-attachments/assets/bbb339b7-f702-44c0-969f-9f03243449e5" />
+
+<img width="364" height="109" alt="image" src="https://github.com/user-attachments/assets/0e31c200-58ff-42c9-89b1-73873de1f09f" />
+
+# Ubuntu Setup for The Hive & Cortex
+
+<img width="433" height="148" alt="image" src="https://github.com/user-attachments/assets/7d887d02-8c3b-4e5a-ba05-e1115c341266" />
+
+<img width="247" height="155" alt="image" src="https://github.com/user-attachments/assets/02baec55-7d94-43dc-b2ac-4a5d088941eb" />
+
+<img width="473" height="89" alt="image" src="https://github.com/user-attachments/assets/12b0dfa8-ce56-40e4-8b23-b20631dfbfbe" />
+
+<img width="454" height="136" alt="image" src="https://github.com/user-attachments/assets/1b263731-9500-43bf-b7b1-5072ae884bdf" />
+
+<img width="454" height="205" alt="image" src="https://github.com/user-attachments/assets/57cb15a1-4ab9-4a8f-97fc-f91d0db6e488" />
+
+Same change to the storage, edit it to use the full `58G` capacity.
+
+<img width="295" height="231" alt="Screenshot 2026-09-27 121531" src="https://github.com/user-attachments/assets/d07a34c3-35e6-4015-af6b-97083bdcbfb6" />
+
+<img width="310" height="211" alt="image" src="https://github.com/user-attachments/assets/a06f3bac-65ed-4c7f-a05a-1be69ee05366" />
+
+<img width="434" height="120" alt="image" src="https://github.com/user-attachments/assets/5514ca67-abe6-42dd-a60c-083af25333b0" />
+
+After finishing install, remove media to continue.
+
+Quick connectivity check with `ping -c 3 10.0.20.1` and `ping -c 3 google.com`
+
+<img width="319" height="133" alt="image" src="https://github.com/user-attachments/assets/53d719b6-7f66-49c8-b1c0-874566601d9c" />
+
+The hive and cortex both require Java so I will first install that
+
+`sudo apt update && sudo apt install -y openjdk-11-jdk`
+
+Then I will download and store Cassandra's signing key
+
+`sudo mkdir -p /usr/share/keyrings curl -1sLf 'https://downloads.apache.org/cassandra/KEYS' | sudo gpg --dearmor -o /usr/share/keyrings/cassandra-archive-keyring.gpg`
+
+I added in the ability to copy and paste using 
+
+Then to add into the allow list on the host machine `qm set {vmid} -vga qxl,clipboard=vnc`
+
+Then `echo 'deb [signed-by=/usr/share/keyrings/cassandra-archive-keyring.gpg] https://debian.cassandra.apache.org 41x main' | sudo tee /etc/apt/sources.list.d/cassandra.sources.list` then `sudo apt update` then `sudo apt install -y cassandra` then verify with `sudo systemctl status cassandra`
+
+<img width="437" height="39" alt="image" src="https://github.com/user-attachments/assets/0486d99d-86b4-4529-871f-634d64b47d34" />
+
+Moving onto downloading elastic searches signing key with 
+
+`curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg`
+
+Then add Elasticsearch repository with `echo 'deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main' | sudo tee /etc/apt/sources.list.d/elastic-7.x.list` then `sudo apt update`
+
+Then install Elasticsearch with `sudo apt install -y elasticsearch`
+
+Then run it with `sudo systemctl enable elasticsearch` then `sudo systemctl start elasticsearch` then `sudo systemctl status elasticsearch`
+
+Data VM is functionally installed — but by default, both Cassandra and Elasticsearch only listen on localhost, which won't work since TheHive/Cortex will live on a separate VM and need to reach them over the network.
+
+sudo nano /etc/cassandra/cassandra.yaml Find listen_address: localhost and change it to listen_address: 10.0.20.12. Find rpc_address: localhost and change it to rpc_address: 10.0.20.12. Save (Ctrl+O, Enter) and exit (Ctrl+X).
+
+<img width="111" height="46" alt="image" src="https://github.com/user-attachments/assets/927992e9-afc2-4a09-984d-fd8f8abb748a" />
+
+<img width="340" height="40" alt="image" src="https://github.com/user-attachments/assets/4e8b55a2-94c0-473a-bcb2-fd0be75431fe" />
+
+Then restart Cassandra with `sudo systemctl restart cassandra` then `sudo systemctl status cassandra` Confirm it comes back up active with the new bind address.
+
+I had to make another edit in the file 
+
+<img width="274" height="99" alt="image" src="https://github.com/user-attachments/assets/85e19dbb-b06d-489d-85fa-89ef68de0939" />
+
+Confirmed it is listening correctly
+
+<img width="445" height="333" alt="image" src="https://github.com/user-attachments/assets/6605322b-854c-43db-bb94-00069ea4e59a" />
+
+Now Ill do the same for Elasticsearch
+
+`sudo nano /etc/elasticsearch/elasticsearch.yml`
+
+My yaml file was empty so I am going to confirm it exists with `ls -la /etc/elasticsearch/elasticsearch.yml`
+
+<img width="312" height="40" alt="image" src="https://github.com/user-attachments/assets/eb6a45db-7c9c-44a7-a99e-8b5d604b09c6" />
+
+I will remove the one I created with `sudo rm /etc/elasticsearch/elasticsearch.yml`
+
+Confirmed it was there, and I was putting `yaml` instead of `yml`
+
+Then go back to editing the yml file
+
+<img width="297" height="51" alt="image" src="https://github.com/user-attachments/assets/f78cb0b6-94db-4721-9a8c-2d232f79ad78" />
+
+<img width="372" height="30" alt="image" src="https://github.com/user-attachments/assets/d60b06de-a12c-48da-8be2-6611f1de3613" />
+
+Restart elasticsearch `sudo systemctl restart elasticsearch`
+
+Verify its listening `sudo ss -tlnp | grep 9200` Should show 10.0.20.12:9200 listening
+
+<img width="348" height="28" alt="image" src="https://github.com/user-attachments/assets/c15a47cf-8508-40e0-a887-fa0e6c850c47" />
+
+I confirm it responds with `curl http://10.0.20.12:9200`
+
+Next I will make a snap shot
+
+<img width="405" height="108" alt="image" src="https://github.com/user-attachments/assets/60d7fa6a-f239-4be3-9d80-4896c149e67e" />
+
+Quick rundown before new VM creation
+
+VM 100 — pfSense (firewall)
+VM 101 — Wazuh (all-in-one)
+VM 102 — Splunk
+VM 103 — soc-thehive-data-01 (Cassandra + Elasticsearch) — just finished
+VM 104 — soc-thehive-app-01 (TheHive + Cortex) — building now
+
+# The Hive + Cortex VM
+
+<img width="365" height="108" alt="image" src="https://github.com/user-attachments/assets/82b70564-c5a2-4cfb-b2c9-66d3c9a7225e" />
+
+<img width="358" height="123" alt="image" src="https://github.com/user-attachments/assets/7814b97a-d6d2-4224-8f40-fa4ca5c7d137" />
+
+<img width="357" height="120" alt="image" src="https://github.com/user-attachments/assets/c2c16eb4-1e4e-423c-b8a7-dbe57bcbf0a1" />
+
+<img width="360" height="145" alt="image" src="https://github.com/user-attachments/assets/a57a23b2-fb90-447d-a766-38e2ad8d47a1" />
+
+<img width="363" height="85" alt="image" src="https://github.com/user-attachments/assets/7c60f309-be77-4dcc-84f0-
+7412ca02456b" />
+
+<img width="372" height="72" alt="image" src="https://github.com/user-attachments/assets/ac0bcfa0-fce9-491b-8e3c-d4228d9fb964" />
+
+<img width="367" height="117" alt="image" src="https://github.com/user-attachments/assets/2a49a98f-acd2-44f2-8e1b-fad7d5f72415" />
+
+Same Ubuntu setup as before, I wont share here. And also confirmed connectivity
+
+# Install Java and jq
+
+`sudo apt install -y jq openjdk-11-jdk jq` -  lets us pull the current package URL programmatically instead of hardcoding a version number that'll go stale.
+
+I ran into many errors, too many to list, so just know its installed now.
+
+Next I move to installing the Hive `wget -O /tmp/thehive.deb "$DEB_URL"` then `sudo dpkg -i /tmp/thehive.deb`
+
+Next is to configure TheHive to point at your Cassandra+Elasticsearch VM
+
+1. `openssl rand -hex 32` copy the text
+2. `sudo nano /etc/thehive/application.conf`
+3. Edit with hive IP, removing any 127.0.0.0 IPs present
+4. Then `sudo bash -c 'cat > /etc/thehive/secret.conf << _EOF_
+play.http.secret.key="$(cat /dev/urandom | tr -dc "a-zA-Z0-9" | fold -w 64 | head -n 1)"
+_EOF_'`
+
+Then I start the hive `sudo systemctl start thehive` then `sudo systemctl status thehive` then `sudo tail -n 50 /var/log/thehive/application.log`
+
+Confirmed it was up and running with `curl -sI http://localhost:9000 -X GET`
+
+Next is to add a firewall rule in pfsense
 
 
 

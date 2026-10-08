@@ -368,6 +368,119 @@ Confirmed it was up and running with `curl -sI http://localhost:9000 -X GET`
 
 Next is to add a firewall rule in pfsense
 
+<img width="496" height="237" alt="image" src="https://github.com/user-attachments/assets/cd1e346b-f077-420c-b965-ef69a4ba76bd" />
+
+`Source = 192.168,0,0/24`
+
+`Destination = 10.0.20.0/24`
+
+`Port = 9000`
+
+`Action = Pass`
+
+I check the current states to see if `10.0.20.13` is on the list, which its not.
+
+<img width="207" height="271" alt="image" src="https://github.com/user-attachments/assets/a2bc3d3f-c90a-41fe-8186-c589c18ec4d6" />
+
+Then I check states from my IP to `10.0.20.13`, which I dont have either.
+
+<img width="213" height="334" alt="image" src="https://github.com/user-attachments/assets/e0699849-3bf7-4893-8a4a-efe5962493b8" />
+
+I then run a packet capture to troubleshoot
+
+<img width="485" height="403" alt="image" src="https://github.com/user-attachments/assets/548095c7-a3ec-4a55-84c0-433588170d77" />
+
+Try to connect to the web ui, the stop the capture, and no packets were captured.
+
+I double check my IP address
+
+<img width="345" height="106" alt="image" src="https://github.com/user-attachments/assets/a9781511-3334-44f3-a4a8-81b7ec506cfd" />
+
+Then I will trace the route from my pc with `tracert -d 10.0.20.13`
+
+<img width="261" height="199" alt="image" src="https://github.com/user-attachments/assets/5d6116f0-ba6c-4cdb-9a08-26b994595b6e" />
+
+In my windows pc I `route print` and see my entry for `10.0.20.0` is no longer there 
+
+I add it with  `route add 10.0.20.0 mask 255.255.255.0 192.168.0.254`
+
+Re do the packet capture, and now I see the entries I am looking for
+
+<img width="274" height="178" alt="image" src="https://github.com/user-attachments/assets/5555d2d1-e580-4543-9e86-8ea1e0ee0ef9" />
+
+I double check the states are captured now
+
+<img width="219" height="283" alt="image" src="https://github.com/user-attachments/assets/e7f03e65-75e1-4325-83d6-66df3b213a2a" />
+
+On 103 I check to see if cassandra and elastic are listening with `sudo ss -tlnp | grep 9042` `sudo ss -tlnp | grep 9200`
+
+<img width="345" height="28" alt="image" src="https://github.com/user-attachments/assets/c534496a-d056-4186-b9f0-cd4c28076ad0" />
+
+Then check the hives status `sudo systemctl status thehive`
+
+<img width="310" height="52" alt="image" src="https://github.com/user-attachments/assets/5ebf9b5d-c4af-425c-a823-b2559bef6a71" />
+
+Then restart the hive `sudo systemctl restart thehiv`
+
+<img width="297" height="103" alt="image" src="https://github.com/user-attachments/assets/cefecd23-83c4-4f42-b009-a81dc28de4be" />
+
+Then see if elastic is even running with `systemctl status elasticsearch` then `systemctl is-active elasticsearch` then `ps aux | grep elasticsearch`
+
+<img width="279" height="37" alt="image" src="https://github.com/user-attachments/assets/e2fec213-fbe3-41f0-b6ee-b0ba273478ec" />
+
+Seems my shell was stuck, I restarted it.
+
+Double checked its running.
+
+<img width="118" height="133" alt="image" src="https://github.com/user-attachments/assets/cf67cc66-48b2-403e-9790-95576b9f190d" />
+
+Then completed the initial admin set up, then took a snapshot of each VM.
+
+<img width="258" height="92" alt="image" src="https://github.com/user-attachments/assets/950b82c4-d96d-402c-8b2b-c6cfb8dbf851" />
+
+<img width="271" height="89" alt="Screenshot 2026-10-07 175725" src="https://github.com/user-attachments/assets/d96beb66-c26c-4d42-ac39-2d242d09de54" />
+
+# Cortex Install
+
+On 104 I run `curl -s https://cortex.download.strangebee.com/manifest.json -o /tmp/cortex-manifest.json`
+
+Confirm with `ls -la /tmp/cortex-manifest.json`
+
+Then confirm the version with `LATEST=$(cat /tmp/cortex-manifest.json | jq -r '.index.latest.cortex')`
+
+Confirm the url `DEB_URL=$(cat /tmp/cortex-manifest.json | jq -r ".products.cortex.all_versions[\"$LATEST\"].deb.url")`
+
+Then install with `wget -O /tmp/cortex.deb "$DEB_URL"` then `sudo dpkg -i /tmp/cortex.deb`
+
+<img width="439" height="178" alt="image" src="https://github.com/user-attachments/assets/1a508fd9-b13d-423c-ada6-745f2cb58ad1" />
+
+Next I will point Elastic to Cortex `nano /etc/cortex/application.conf`
+
+Set the secret key and changed the local IP to `10.0.20.12`
+
+Start Cortex `sudo systemctl start cortex`
+
+I am getting errors 
+
+<img width="530" height="109" alt="image" src="https://github.com/user-attachments/assets/c0a00d1b-8053-4187-a75a-347d04df3269" />
+
+The fix: `sudo chown -R cortex:cortex /opt/cortex` then I could start it
+
+I confirmed I can connect
+
+<img width="303" height="125" alt="image" src="https://github.com/user-attachments/assets/24d9dfbb-9372-4d58-8524-e9e43e76f0eb" />
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

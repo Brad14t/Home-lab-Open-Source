@@ -564,6 +564,125 @@ Test and it worked!
 
 <img width="229" height="180" alt="image" src="https://github.com/user-attachments/assets/b4c59ffe-b331-4f55-a5f1-5509d07ce354" />
 
+# Wazuh to TheHive Connection
+
+First I create a Wazuh user within the hive
+
+<img width="415" height="292" alt="image" src="https://github.com/user-attachments/assets/6fb9ad6c-2f86-4a12-aeeb-4ac8a4cfc791" />
+
+Create an API key for the user
+
+Test ping from wazuh to hive and vise versa.
+
+Test connection to TheHive API port with `curl -s -o /dev/null -w "%{http_code}\n" http://10.0.20.13:9000`
+
+<img width="312" height="126" alt="image" src="https://github.com/user-attachments/assets/ce784f10-4adf-400f-887f-2ca11c260f98" />
+
+200 means the Wazuh VM can reach TheHive’s API port. The folder also contains stock wrappers (slack, shuffle and others). Their bash launcher is generic: it runs the .py file with the same name from the same folder using Wazuh’s embedded Python. So we copy one and name it for our integration. Custom integration names have to start with custom-.
+
+
+First I create the wrapper with `sudo cp /var/ossec/integrations/slack /var/ossec/integrations/custom-w2thive`
+
+Then open a new file for the script `sudo nano /var/ossec/integrations/custom-w2thive.py
+
+Then I paste:
+`#!/var/ossec/framework/python/bin/python3
+# custom-w2thive: forward Wazuh alerts to TheHive 5 (POST /api/v1/alert)
+import hashlib
+import json
+import sys
+
+import requests
+
+LOG_FILE = "/var/ossec/logs/integrations.log"
+
+
+def log(msg):
+    with open(LOG_FILE, "a") as f:
+        f.write("custom-w2thive: " + msg + "\n")
+
+
+def thehive_severity(level):
+    if level >= 12:
+        return 4
+    if level >= 10:
+        return 3
+    if level >= 7:
+        return 2
+    return 1
+
+
+def main():
+    alert_file, api_key, hook_url = sys.argv[1], sys.argv[2], sys.argv[3]
+    with open(alert_file) as f:
+        alert = json.load(f)
+
+    rule = alert.get("rule", {})
+    agent = alert.get("agent", {})
+    data = alert.get("data", {})
+    level = int(rule.get("level", 0))
+
+    ref = str(alert.get("id") or hashlib.sha1(
+        json.dumps(alert, sort_keys=True).encode()).hexdigest())
+    title = "Wazuh {}: {} on {}".format(
+        rule.get("id", "?"), rule.get("description", "alert"),
+        agent.get("name", "unknown"))
+    description = (
+        "**Rule:** {} (level {})\n\n"
+        "**Agent:** {} ({})\n\n"
+        "**Location:** {}\n\n"
+        "**Log:**\n```\n{}\n```"
+    ).format(rule.get("id"), level, agent.get("name"),
+             agent.get("ip", "n/a"), alert.get("location"),
+             str(alert.get("full_log", ""))[:2000])
+
+    tags = ["wazuh", "rule:" + str(rule.get("id"))]
+    tags += ["group:" + g for g in rule.get("groups", [])][:5]
+
+    observables = []
+    if data.get("srcip"):
+        observables.append(
+            {"dataType": "ip", "data": data["srcip"], "tags": ["wazuh"]})
+
+    payload = {
+        "type": "wazuh_alert",
+        "source": "wazuh",
+        "sourceRef": ref,
+        "title": title,
+        "description": description,
+        "severity": thehive_severity(level),
+        "tlp": 2,
+        "pap": 2,
+        "tags": tags,
+        "observables": observables,
+    }
+
+    try:
+        r = requests.post(
+            hook_url.rstrip("/") + "/api/v1/alert",
+            headers={"Authorization": "Bearer " + api_key},
+            json=payload, timeout=15)
+        log("HTTP {} for rule {} ({})".format(r.status_code, rule.get("id"), ref))
+        if r.status_code >= 300:
+            log(r.text[:300])
+    except Exception as e:
+        log("error: {}".format(e))
+
+
+if __name__ == "__main__":
+    main()`
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

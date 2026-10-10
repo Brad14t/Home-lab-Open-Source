@@ -19,8 +19,6 @@ Why: A new pfSense interface has no rules, so it denies everything. DC01 needs D
 
 ### pfSense CORPORATE Interface Rules (10.0.30.0/24)
 
-Rules are processed top to bottom; first match wins.
-
 **Alias:** `RFC1918` = `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`
 
 | # | Action | Protocol | Source | Destination | Port | Log | Description |

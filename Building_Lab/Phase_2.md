@@ -670,23 +670,58 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-`
+    main()`
+
+    
+Then change the ownership with `sudo chown root:wazuh /var/ossec/integrations/custom-w2thive /var/ossec/integrations/custom-w2thive.py`
+
+Then `sudo chmod 750 /var/ossec/integrations/custom-w2thive /var/ossec/integrations/custom-w2thive.py`
+
+this checks that the paste didn’t mangle the code. No output means it’s fine. `sudo /var/ossec/framework/python/bin/python3 -m py_compile /var/ossec/integrations/custom-w2thive.py`
+
+Next is for me to tell Wazuh when to fire it with `sudo nano /var/ossec/etc/ossec.conf`
+
+Then paste in after </global>:
+`  <integration>
+    <name>custom-w2thive</name>
+    <hook_url>http://10.0.20.13:9000</hook_url>
+    <api_key>PASTE_YOUR_THEHIVE_API_KEY_HERE</api_key>
+    <level>5</level>
+    <alert_format>json</alert_format>
+  </integration>`
+
+<img width="372" height="277" alt="Screenshot 2026-10-10 111207" src="https://github.com/user-attachments/assets/2efb486c-cac0-4087-bcc5-f39164e43690" />
+
+Restarted `wauh-manager`
+  
+<img width="448" height="54" alt="image" src="https://github.com/user-attachments/assets/331a132d-d01f-47ae-93a4-1ee0a803e5c1" />
+
+I check the integration daemon is up then generate a test event.
+
+<img width="373" height="127" alt="image" src="https://github.com/user-attachments/assets/9cc083b9-4067-424c-8f18-2e5cc57390a7" />
+
+Then check if the script ran with `sudo tail -n 15 /var/ossec/logs/integrations.log`
+
+<img width="322" height="85" alt="image" src="https://github.com/user-attachments/assets/18d89dd3-eac0-4256-81dd-a0944a3fc46c" />
+
+It is successful. I then log in as the wazuh user and check alerts
+
+<img width="955" height="456" alt="image" src="https://github.com/user-attachments/assets/024902f4-e54d-4cb9-8dfe-e827d07b2911" />
+
+I am SSh'ed into my wazuh server, I will run a test without being sshed
+
+<img width="290" height="171" alt="image" src="https://github.com/user-attachments/assets/3b65d4d1-4404-439d-a2b1-0eb24d71619d" />
+
+<img width="100" height="154" alt="image" src="https://github.com/user-attachments/assets/3e714cf6-b1cc-4d65-befa-4d8337a1da67" />
+
+Next I will raise the threshold of the script from 5 to 7 to decrease flood
+
+<img width="72" height="19" alt="image" src="https://github.com/user-attachments/assets/99ed3be0-cfdc-46ff-b565-9b120833b048" />
+
+<img width="70" height="19" alt="image" src="https://github.com/user-attachments/assets/9fce899f-d79b-40f0-800d-908e42cd6352" />
+
+Then restart Wazuh, and snapshot 101 and 104 VM
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# End of Phase 2
 

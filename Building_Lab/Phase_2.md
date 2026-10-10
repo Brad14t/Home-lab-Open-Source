@@ -470,25 +470,99 @@ I confirmed I can connect
 
 <img width="303" height="125" alt="image" src="https://github.com/user-attachments/assets/24d9dfbb-9372-4d58-8524-e9e43e76f0eb" />
 
+# Adding Firewall Rule for Cortex
+
+`Add` new rule in pfsense
+
+<img width="511" height="193" alt="image" src="https://github.com/user-attachments/assets/68e283f7-38f7-44d1-89af-2e372de62075" />
+
+Action = `Pass`, Interface = `WAN`, Address Family = `IPv4`, Protocol = `TCP`, Source = `192.168.0.0/24`, Destination = `10.0.20.0/24`
+
+<img width="468" height="31" alt="image" src="https://github.com/user-attachments/assets/673e7903-0fb4-4f1a-98c7-9e48c21c0270" />
+
+Test Cortex by going to `http://10.0.20.13:9001`
+
+# Cortex Setup
+
+Create admin account
+
+<img width="501" height="306" alt="image" src="https://github.com/user-attachments/assets/e8ed9c9f-63dd-46f4-9d59-2a9f79da69e1" />
 
 
+I add an orginization, name it and add a description
+`Lab` and `Lab Cortex`
 
+<img width="490" height="150" alt="image" src="https://github.com/user-attachments/assets/7f0cf8a3-f84d-43f9-bf57-03c0ff952d95" />
 
+Click on the lab, and add a user
 
+Login: `Lab_Cortex_User01`
+Name: `John Smith`
+Roles: `read, analyze, orgadmin`
 
+Create an API key for the user
 
+<img width="654" height="117" alt="image" src="https://github.com/user-attachments/assets/d49febbd-9a09-428f-a3cd-750941add188" />
 
+Logged out of the super admin then back into the newly created account
 
+# Docker install
 
+Next I need to hook up Docker, on 104 I run `sudo apt install -y docker.io`
 
+Once done I run `sudo systemctl enable --now docker`
 
+Then `sudo usermod -aG docker cortex` (lets the cortex user use Docker. -aG appends, so it won’t wipe its existing groups.)
 
+And double check its running `sudo systemctl status docker`
 
+<img width="288" height="67" alt="image" src="https://github.com/user-attachments/assets/03bfebef-b61a-49a9-9426-c171d8555976" />
 
+I restart cortex `sudo systemctl restart cortex` then check with `sudo systemctl status cortex`
 
+I will test a couple analyzers to test the whole chain.
 
+<img width="939" height="125" alt="image" src="https://github.com/user-attachments/assets/50d182ff-5e6d-4932-934c-4dec3a8c18af" />
 
+<img width="930" height="56" alt="image" src="https://github.com/user-attachments/assets/98f18061-c9ac-4a44-b581-94d9e8bdfb75" />
 
+<img width="451" height="214" alt="image" src="https://github.com/user-attachments/assets/aa2a38a2-c95a-4eca-9646-f900b7b4758e" />
+
+It was successful 
+
+<img width="949" height="219" alt="image" src="https://github.com/user-attachments/assets/4612bed1-fe12-444c-baae-8c0bd906704e" />
+
+Created a snapshot
+
+<img width="429" height="202" alt="image" src="https://github.com/user-attachments/assets/92c9a81e-90ba-4678-b333-fa9345e52014" />
+
+# The Hive to Cotrex Link
+
+I go to `platform management` -> `connectors` -> `Cortex tab` and set up a new server
+
+<img width="207" height="55" alt="image" src="https://github.com/user-attachments/assets/3186802d-e784-45e8-8832-f89e7143a3e7" />
+
+Set up an orginization
+
+<img width="194" height="232" alt="image" src="https://github.com/user-attachments/assets/44412138-e180-4684-8f5e-a55c7c23591f" />
+
+Add my admin to the org
+
+Add a new user to the org, sign out of admin, sign back into new account
+
+Create a case
+
+<img width="439" height="447" alt="image" src="https://github.com/user-attachments/assets/ca0f7671-d452-4346-850b-c1480537facc" />
+
+<img width="349" height="340" alt="image" src="https://github.com/user-attachments/assets/13c475f6-9fa4-4c8b-9aa3-bad9245a94d3" />
+
+Go to `observables` then create one
+
+<img width="364" height="202" alt="image" src="https://github.com/user-attachments/assets/52b3f5ca-1277-4c92-a04c-22d85a5f31e4" />
+
+Test and it worked!
+
+<img width="229" height="180" alt="image" src="https://github.com/user-attachments/assets/b4c59ffe-b331-4f55-a5f1-5509d07ce354" />
 
 
 

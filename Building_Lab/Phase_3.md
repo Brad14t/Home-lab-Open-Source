@@ -387,7 +387,7 @@ On Wazuh Manager (101) I check they are all there with `sudo /var/ossec/bin/agen
 
 <img width="285" height="80" alt="image" src="https://github.com/user-attachments/assets/f603700e-be79-47d5-89d5-86bd40325df8" />
 
-
+Snapshot and this is the complete of phase 3
 
 
 

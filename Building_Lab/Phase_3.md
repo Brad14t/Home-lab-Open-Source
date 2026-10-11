@@ -85,21 +85,102 @@ pfSense → Services → DHCP Server → CORPORATE:
 
 Create OU Structure
 
-lab.local
-└── LAB
-    ├── Admins
-    ├── Service Accounts
-    ├── Groups
-    ├── Servers
-    ├── Workstations
-    └── Users
-        ├── IT
-        ├── HR
-        ├── Finance
-        └── Sales
+<img width="120" height="145" alt="image" src="https://github.com/user-attachments/assets/4e03a632-18d2-4ca1-baf0-9af099e3955a" />
+
+Create the top-level OU: `New-ADOrganizationalUnit -Name "LAB" -Path "DC=lab,DC=local"`
+
+Create the second-level OUs: `"Admins","Service Accounts","Groups","Servers","Workstations","Users" | ForEach-Object { New-ADOrganizationalUnit -Name $_ -Path "OU=LAB,DC=lab,DC=local" }`
+
+Create the department OUs: `"IT","HR","Finance","Sales" | ForEach-Object { New-ADOrganizationalUnit -Name $_ -Path "OU=Users,OU=LAB,DC=lab,DC=local" }`
+
+Send newly joined computers to the Workstations OU instead of the default Computers container, so GPOs apply to them right away: `redircmp "OU=Workstations,OU=LAB,DC=lab,DC=local"`
+
+<img width="453" height="203" alt="image" src="https://github.com/user-attachments/assets/d8270b0f-9440-4792-b7a3-fdef6ab5d89a" />
+
+Rename my mistake "Financ" and remove accidental deletion: `Set-ADOrganizationalUnit -Identity "OU=Financ,OU=Users,OU=LAB,DC=lab,DC=local" -ProtectedFromAccidentalDeletion $false`
+
+`Rename-ADObject -Identity "OU=Financ,OU=Users,OU=LAB,DC=lab,DC=local" -NewName "Finance"`
+
+Then turn it back on `Set-ADOrganizationalUnit -Identity "OU=Finance,OU=Users,OU=LAB,DC=lab,DC=local" -ProtectedFromAccidentalDeletion $true`
+
+Confirm: `Get-ADOrganizationalUnit -Filter 'Name -like "Fin*"' -Properties ProtectedFromAccidentalDeletion | Select-Object DistinguishedName,ProtectedFromAccidentalDeletion`
+
+Next part is the groups, users, and services
+
+Why: This gives realistic identities for GPO targeting, logons for Wazuh to monitor, and two deliberately weak service accounts as targets for Phase 6 attack/detect scenarios.
+
+Groups: `"IT-Staff","HR-Staff","Finance-Staff","Sales-Staff","Workstation-Admins" | ForEach-Object { New-ADGroup -Name $_ -GroupScope Global -GroupCategory Security -Path "OU=Groups,OU=LAB,DC=lab,DC=local" }`
+
+Standard users (2 per department): `$pw = Read-Host -AsSecureString "Initial user password"`
+
+Define the users: `$users = @(@{S="jcarter";G="James";L="Carter";D="IT"},@{S="mlopez";G="Maria";L="Lopez";D="IT"},@{S="spatel";G="Sanjay";L="Patel";D="HR"},@{S="kwong";G="Karen";L="Wong";D="HR"},@{S="dkim";G="Daniel";L="Kim";D="Finance"},@{S="rjohnson";G="Rachel";L="Johnson";D="Finance"},@{S="tnguyen";G="Tom";L="Nguyen";D="Sales"},@{S="abrooks";G="Amy";L="Brooks";D="Sales"})`
+
+Create each user and add them to their department group: `$users | ForEach-Object { New-ADUser -Name "$($_.G) $($_.L)" -GivenName $_.G -Surname $_.L -SamAccountName $_.S -UserPrincipalName "$($_.S)@lab.local" -Department $_.D -Path "OU=$($_.D),OU=Users,OU=LAB,DC=lab,DC=local" -AccountPassword $pw -Enabled $true; Add-ADGroupMember -Identity "$($_.D)-Staff" -Members $_.S }`
+
+create an alternate admin account 
+
+Why: Stop using the built-in Administrator for daily work. A separate named admin account leaves a clear audit trail, and the writeup can call this tiered admin practice.
+
+`$adminPw = Read-Host -AsSecureString "adm-brad password"`
+
+`New-ADUser -Name "adm-brad" -SamAccountName "adm-brad" -UserPrincipalName "adm-brad@lab.local" -Path "OU=Admins,OU=LAB,DC=lab,DC=local" -AccountPassword $adminPw -Enabled $true -Description "Personal domain admin account"`
+
+`Add-ADGroupMember -Identity "Domain Admins" -Members "adm-brad"`
+
+Next create the vulnerable accounts
+
+`$svcPw = Read-Host -AsSecureString "Weak service account password"`
+
+`New-ADUser -Name "svc-sql" -SamAccountName "svc-sql" -UserPrincipalName "svc-sql@lab.local" -Path "OU=Service Accounts,OU=LAB,DC=lab,DC=local" -AccountPassword $svcPw -Enabled $true -PasswordNeverExpires $true -Description "INTENTIONALLY VULNERABLE - Kerberoastable (lab)"`
+
+`Set-ADUser -Identity "svc-sql" -ServicePrincipalNames @{Add="MSSQLSvc/sql01.lab.local:1433"}`
+
+`New-ADUser -Name "svc-backup" -SamAccountName "svc-backup" -UserPrincipalName "svc-backup@lab.local" -Path "OU=Service Accounts,OU=LAB,DC=lab,DC=local" -AccountPassword $svcPw -Enabled $true -PasswordNeverExpires $true -Description "INTENTIONALLY VULNERABLE - AS-REP roastable (lab)"`
+
+`Set-ADAccountControl -Identity "svc-backup" -DoesNotRequirePreAuth $true`
+
+In production, service accounts would be gMSAs (auto-rotated 120-character passwords). These two are deliberately misconfigured, and the repo should say so clearly.
+
+Confirm the accoutns
+
+<img width="487" height="141" alt="image" src="https://github.com/user-attachments/assets/a4579c75-2a11-4aad-acd0-68046572d0d9" />
+
+# Building DC02
+
+Why: A second DC gives AD redundancy. It also gives you replication to monitor, and replication events are what DCSync detection looks for in Phase 6.
+
+<img width="360" height="103" alt="image" src="https://github.com/user-attachments/assets/6465a58b-99d3-46c5-98b4-42deb7ca5445" />
+
+<img width="354" height="142" alt="image" src="https://github.com/user-attachments/assets/63479007-90bd-4775-a177-7fb5cbea0017" />
+
+<img width="358" height="156" alt="image" src="https://github.com/user-attachments/assets/a387b8df-5d16-426f-aa56-036c5e240a0d" />
+
+<img width="360" height="154" alt="image" src="https://github.com/user-attachments/assets/4584edcd-b56a-4c46-b72a-19457e1f4e9f" />
+
+<img width="358" height="78" alt="image" src="https://github.com/user-attachments/assets/8b1f025c-83b5-4f19-a073-b3bea62fbb47" />
+
+<img width="360" height="104" alt="image" src="https://github.com/user-attachments/assets/366ed7ce-397d-47e1-8046-8aa2fa6ed066" />
+
+<img width="291" height="230" alt="image" src="https://github.com/user-attachments/assets/8ae8ee72-f0b6-4aaf-969f-a17b034771d6" />
+
+<img width="297" height="238" alt="image" src="https://github.com/user-attachments/assets/679eafec-de97-4751-aa85-b0eedd67c3e0" />
+
+<img width="307" height="245" alt="image" src="https://github.com/user-attachments/assets/dce2fd05-845e-4ba0-9bee-f0fafaf3c62b" />
+
+<img width="209" height="157" alt="image" src="https://github.com/user-attachments/assets/5f44287e-50d3-4177-a5cb-fa77df04805d" />
+
+Attach the two with
+DC02 `Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 10.0.30.10,127.0.0.1` and `Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 10.0.30.11,127.0.0.1` on DC01
 
 
+Add `10.0.30.11` as secondary DNS
 
+<img width="156" height="124" alt="image" src="https://github.com/user-attachments/assets/0e68f465-e64b-423a-b247-00a07edecd5f" />
 
+Verify with `Get-ADDomainController -Filter * | Select-Object Name,IPv4Address,IsGlobalCatalog`
 
+<img width="450" height="73" alt="image" src="https://github.com/user-attachments/assets/08e5055f-60cb-4e44-9c8d-af36ebe156e6" />
 
+Then in proxmox shell take a snapshot of both
+`qm snapshot 110 phase3-dc02-replicating --vmstate 1 --description "Two-DC forest, replication healthy"`
+`qm snapshot 111 phase3-dc02-replicating --vmstate 1 --description "Two-DC forest, replication healthy"`

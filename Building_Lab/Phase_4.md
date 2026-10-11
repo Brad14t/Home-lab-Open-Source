@@ -38,19 +38,6 @@ Rules are processed top to bottom; first match wins. Anything not matched hits p
 | 6 | Block | Any | VULNERABLE subnets | RFC1918 | any | Yes | Block other VLANs and home network |
 | 7 | Pass | Any | VULN_DOCKER | any | any | No | **Temporary:** internet for build (disabled after image pulls) |
 
-### WAN rule (management access)
-
-The home network sits on pfSense's WAN, which denies inbound by default. Access is scoped to the single management PC. Stateful filtering allows return traffic only, so vulnerable hosts cannot open connections to the home network.
-
-| Source | Destination | Port | Purpose |
-|---|---|---|---|
-| 192.168.0.234 | VULN_DOCKER | VULN_MGMT_PORTS | SSH, Portainer, DVWA, bWAPP |
-
-### Management PC route
-
-```
-route -p add 10.0.40.0 mask 255.255.255.0 192.168.0.254
-```
 
 ### Design notes
 

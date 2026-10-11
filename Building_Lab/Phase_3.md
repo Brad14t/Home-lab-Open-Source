@@ -184,3 +184,220 @@ Verify with `Get-ADDomainController -Filter * | Select-Object Name,IPv4Address,I
 Then in proxmox shell take a snapshot of both
 `qm snapshot 110 phase3-dc02-replicating --vmstate 1 --description "Two-DC forest, replication healthy"`
 `qm snapshot 111 phase3-dc02-replicating --vmstate 1 --description "Two-DC forest, replication healthy"`
+
+
+# Group Policy
+
+Password + lockout policy 
+
+On DC01 `gpmc.msc`
+
+Forest → Domains → lab.local → right-click Default Domain Policy → Edit → Computer Configuration → Policies → Windows Settings → Security Settings → Account Policies
+
+<img width="324" height="190" alt="image" src="https://github.com/user-attachments/assets/719e098f-8bad-44bc-952a-6deddd015a28" />
+
+<img width="391" height="161" alt="image" src="https://github.com/user-attachments/assets/6d561e56-c8c4-438e-81fb-9975ecc1fb88" />
+
+<img width="385" height="100" alt="image" src="https://github.com/user-attachments/assets/de1600a5-7cf8-4e9f-9806-cbb100f0dc41" />
+
+<img width="306" height="115" alt="image" src="https://github.com/user-attachments/assets/d892c394-1050-4ae7-8fbf-db87217027a1" />
+
+<img width="313" height="90" alt="image" src="https://github.com/user-attachments/assets/fbb58d80-1376-47f1-87bf-5f17066dd521" />
+
+Lockouts generate event 4740
+
+# Audit Policy
+
+`New-GPO -Name "LAB - Audit Policy" | New-GPLink -Target "DC=lab,DC=local"`
+
+`Set-GPRegistryValue -Name "LAB - Audit Policy" -Key "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System\Audit" -ValueName "ProcessCreationIncludeCmdLine_Enabled" -Type DWord -Value 1`
+
+Raise the Security log to 512 MB so events aren’t overwritten before Wazuh collects them:
+
+`Set-GPRegistryValue -Name "LAB - Audit Policy" -Key "HKLM\Software\Policies\Microsoft\Windows\EventLog\Security" -ValueName "MaxSize" -Type DWord -Value 524288`
+
+Computer Configuration → Policies → Windows Settings → Security Settings → Local Policies → Security Options
+
+<img width="289" height="150" alt="image" src="https://github.com/user-attachments/assets/9340816c-7a9d-41d3-a38e-6fbd3626e810" />
+
+Security Settings → Advanced Audit Policy Configuration → Audit Policies
+
+<img width="376" height="355" alt="image" src="https://github.com/user-attachments/assets/0bd2510f-0950-4a53-bf7a-02857017edf8" />
+
+# PowerShell logging (PowerShell only)
+
+Why: Script block logging (event 4104) records the de-obfuscated code that actually runs, which is one of the best sources for catching malicious PowerShell.
+
+`New-GPO -Name "LAB - PowerShell Logging" | New-GPLink -Target "DC=lab,DC=local"`
+
+Script block logging:
+`Set-GPRegistryValue -Name "LAB - PowerShell Logging" -Key "HKLM\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -ValueName "EnableScriptBlockLogging" -Type DWord -Value 1`
+
+Module logging:
+`Set-GPRegistryValue -Name "LAB - PowerShell Logging" -Key "HKLM\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging" -ValueName "EnableModuleLogging" -Type DWord -Value 1`
+
+Log all modules:
+`Set-GPRegistryValue -Name "LAB - PowerShell Logging" -Key "HKLM\Software\Policies\Microsoft\Windows\PowerShell\ModuleLogging\ModuleNames" -ValueName "*" -Type String -Value "*"`
+
+These events go to the Microsoft-Windows-PowerShell/Operational channel
+
+Windows Firewall for workstations (PowerShell only)
+
+`New-GPO -Name "LAB - Windows Firewall" | New-GPLink -Target "OU=Workstations,OU=LAB,DC=lab,DC=local"`
+
+Turn the firewall on for all profiles, block inbound, allow outbound, and log dropped packets:
+
+`Set-NetFirewallProfile -PolicyStore "lab.local\LAB - Windows Firewall" -Profile Domain,Private,Public -Enabled True -DefaultInboundAction Block -DefaultOutboundAction Allow -LogBlocked True -LogMaxSizeKilobytes 16384`
+
+Apply 
+`gpupdate /force`
+
+Confirm 
+`Get-ADDefaultDomainPasswordPolicy`
+
+<img width="279" height="135" alt="image" src="https://github.com/user-attachments/assets/72ecd829-d49c-4b0f-ad75-f3474664e6bc" />
+
+
+Create backup of GPO's
+
+`New-Item -ItemType Directory -Path C:\GPOBackups -Force; Backup-GPO -All -Path C:\GPOBackups`
+
+Then take snapshots on both domain controlers
+
+# Create Windows VM
+
+<img width="361" height="99" alt="image" src="https://github.com/user-attachments/assets/82a961df-01b5-405d-b8aa-55bd086486ff" />
+
+<img width="358" height="131" alt="image" src="https://github.com/user-attachments/assets/440cee54-ed6f-4e02-9afa-5b8a45093cd0" />
+
+<img width="356" height="172" alt="image" src="https://github.com/user-attachments/assets/66f85a6c-a841-4ef0-9f62-b2aed4ea1ccf" />
+
+<img width="357" height="130" alt="image" src="https://github.com/user-attachments/assets/8eee877a-14cd-4f1c-8b7d-d0e6636faedd" />
+
+<img width="358" height="81" alt="image" src="https://github.com/user-attachments/assets/f834018e-629d-4643-9255-31085b16a22d" />
+
+<img width="258" height="65" alt="image" src="https://github.com/user-attachments/assets/f742c349-6337-47dc-9b3e-91456c1a73bd" />
+
+<img width="359" height="112" alt="image" src="https://github.com/user-attachments/assets/e7481f21-92f9-4a84-ba6e-c41c14c1beb9" />
+
+<img width="296" height="154" alt="image" src="https://github.com/user-attachments/assets/fb2ff350-d918-4ff9-8be4-f1e931db2a0d" />
+
+<img width="295" height="133" alt="image" src="https://github.com/user-attachments/assets/6665a6eb-78c2-4456-88f8-5e8e00be1db5" />
+
+<img width="292" height="142" alt="image" src="https://github.com/user-attachments/assets/aeefe9d3-f4d0-4f8d-ab9c-d45eccec48c3" />
+
+Create a local account
+
+then run `virtio-win-guest-tools.exe`
+
+Now check the DNS is correct with `10.0.30.10` and `10.0.30.11`
+
+<img width="173" height="25" alt="image" src="https://github.com/user-attachments/assets/f2602933-4d80-4ada-b563-0bff6e4dcc3e" />
+
+`Add-Computer -DomainName "lab.local" -NewName "WS01" -Credential "LAB\adm-brad" -Restart`
+
+Confirm on DC01 the vm was added `Get-ADComputer -Filter 'Name -like "WS*" -or Name -like "DESKTOP*"' | Select-Object Name,DistinguishedName`
+
+<img width="495" height="55" alt="image" src="https://github.com/user-attachments/assets/34a312de-49df-4720-877a-5d1010201208" />
+
+Then log into standard user account created earlier `jcarter`
+
+And check connection to the domain, then snapshot.
+
+# Create Another Windows VM
+
+Same steps as above 
+
+name `corp-ws-02`, hostname `WS02`
+
+<img width="361" height="100" alt="image" src="https://github.com/user-attachments/assets/9f6bfa81-de96-4ba8-af12-1419d8da886b" />
+
+<img width="355" height="147" alt="image" src="https://github.com/user-attachments/assets/0634fe4a-31fd-4300-a5c6-653a30071e15" />
+
+<img width="361" height="163" alt="image" src="https://github.com/user-attachments/assets/362537af-e888-4c24-869b-3c1847f0cc59" />
+
+<img width="355" height="76" alt="image" src="https://github.com/user-attachments/assets/c6dff63a-864f-4932-979a-f2b3729b6330" />
+
+<img width="271" height="79" alt="image" src="https://github.com/user-attachments/assets/c0801b28-2fd7-43c5-8e48-0f65507e6ce1" />
+
+<img width="360" height="114" alt="image" src="https://github.com/user-attachments/assets/3d9e2a9e-f4bb-4748-b1aa-922eb4bbf87b" />
+
+<img width="200" height="163" alt="image" src="https://github.com/user-attachments/assets/c2843ee4-26fa-4d57-8346-c6b0e2c4af00" />
+
+<img width="175" height="28" alt="image" src="https://github.com/user-attachments/assets/dda50b81-93bb-4eb2-8636-0e7e7908e87a" />
+
+<img width="358" height="70" alt="image" src="https://github.com/user-attachments/assets/a82e935f-8295-4c24-af25-3849a3346227" />
+
+<img width="412" height="75" alt="image" src="https://github.com/user-attachments/assets/a52179e4-d08e-4d77-b0ec-83759b045e8b" />
+
+All four Windows machines are built. The last step of Phase 3 is getting their logs into Wazuh.
+
+# Sysmon + Wazuh agents
+
+Why: Native Windows logging misses a lot. Sysmon adds detailed process, network, and file telemetry that the attack detections in Phase 6 depend on. The Wazuh agents ship all of it, plus Security and PowerShell logs, to the SIEM.
+
+Approach
+- Download everything once to DC01’s NETLOGON share. Every domain computer can read it, and it replicates to DC02.
+- Install from that share on each machine.
+- A Wazuh agent group named windows pushes extra log channels to all four agents at once.
+
+on 101 Create the windows agent group (on the Wazuh manager)
+
+`sudo /var/ossec/bin/agent_groups -a -g windows -q`
+
+`sudo nano /var/ossec/etc/shared/windows/agent.conf`
+
+Replace the contents with
+`<agent_config os="Windows">
+  <localfile>
+    <location>Microsoft-Windows-Sysmon/Operational</location>
+    <log_format>eventchannel</log_format>
+  </localfile>
+  <localfile>
+    <location>Microsoft-Windows-PowerShell/Operational</location>
+    <log_format>eventchannel</log_format>
+  </localfile>
+</agent_config>`
+
+Verify syntax with `sudo /var/ossec/bin/verify-agent-conf`
+
+Then Stage the installers on NETLOGON (DC01, PowerShell Admin)
+
+`$d = "C:\Windows\SYSVOL\sysvol\lab.local\scripts\Deploy"`
+
+`New-Item -ItemType Directory -Path $d -Force`
+
+`Invoke-WebRequest https://download.sysinternals.com/files/Sysmon.zip -OutFile "$d\Sysmon.zip"`
+
+Sysmon config. I’m using Olaf Hartong’s sysmon-modular, whose rule names map to MITRE ATT&CK techniques, which is useful for detection engineering. SwiftOnSecurity’s sysmonconfig-export.xml is the other common baseline.
+
+`Invoke-WebRequest https://github.com/olafhartong/sysmon-modular/releases/latest/download/sysmonconfig.xml -OutFile "$d\Sysmon\sysmonconfig.xml"`
+
+Repeat on DC01, DC02, WS01, and WS02. On the DCs, use PowerShell (Admin) as adm-brad. On the workstations, use Terminal (Admin) and elevate with adm-brad.
+
+`& "\\lab.local\NETLOGON\Deploy\Sysmon\Sysmon64.exe" -accepteula -i "\\lab.local\NETLOGON\Deploy\Sysmon\sysmonconfig.xml"`
+
+Install the Wazuh agent. -Wait is needed because msiexec otherwise returns before the install finishes. The agent name defaults to the hostname.
+
+<img width="214" height="55" alt="image" src="https://github.com/user-attachments/assets/c9497f5c-8ec7-4aa7-b4ce-0892a016c82c" />
+
+Confirmed all 4 have `Sysmon64` and `Wazuh` running
+
+On Wazuh Manager (101) I check they are all there with `sudo /var/ossec/bin/agent_control -l`
+
+<img width="285" height="80" alt="image" src="https://github.com/user-attachments/assets/f603700e-be79-47d5-89d5-86bd40325df8" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

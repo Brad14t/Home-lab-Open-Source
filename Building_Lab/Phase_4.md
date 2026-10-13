@@ -355,7 +355,7 @@ Check Alerts (Instance: VULNERABLE). You should see an ET WEB_SERVER ... SQL Inj
 <img width="481" height="283" alt="image" src="https://github.com/user-attachments/assets/f920984d-5beb-4ce5-895d-345e19b7e656" />
 
 
-
+This concludes phase 4
 
 
 

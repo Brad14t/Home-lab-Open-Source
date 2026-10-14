@@ -10,7 +10,7 @@ Why this layout:
 - Nessus on its own VM: plugin compilation is RAM- and CPU-heavy and would bog Kali down. A dedicated scanner is also how it’s deployed in real environments.
 - Running set for Phase 5: 100, 101, 130, 131, 140, 141 = about 24 GB. AD VMs stay off.
 
-## ATTACKER VLAN Firewall Rules (10.0.50.0/24)
+## ATTACKER VLAN Firewall Rules
 
 The ATTACKER VLAN hosts the offensive tooling (Kali with Caldera, Nessus Essentials). Unlike the VULNERABLE VLAN, it has internet access for tool updates, Kali packages, and Nessus plugin feeds. Internally it can reach **only** the VULNERABLE VLAN. CORPORATE, SECURITY, the home network, and the pfSense GUI are blocked.
 
@@ -43,12 +43,6 @@ The home network sits on pfSense's WAN, which denies inbound by default. Access 
 |---|---|---|---|---|---|---|
 | Pass | TCP | 192.168.0.234 | ATTACKER_HOSTS | ATK_MGMT_PORTS | No | SSH, Nessus, Caldera |
 
-### Management PC route
-
-```
-route -p add 10.0.50.0 mask 255.255.255.0 192.168.0.254
-```
-
 ### Design notes
 
 - **Scoped attack surface:** rule 4 is the only internal path out of this VLAN, so attacks can only land on intentionally vulnerable targets.
@@ -57,38 +51,46 @@ route -p add 10.0.50.0 mask 255.255.255.0 192.168.0.254
 - **IDS visibility:** attacks from this VLAN cross pfSense into VULNERABLE and are inspected by the Suricata instance on that interface. VULNERABLE's HOME_NET is scoped to 10.0.40.0/24, so ATTACKER traffic is treated as external.
 - **Planned change (Phase 6):** AD attack scenarios (Kerberoasting, AS-REP roasting) and Caldera agent callbacks will need narrow ATTACKER ↔ CORPORATE rules, scoped to specific hosts and ports and added only for the exercise.
 
+Creating an alias for the attacker vms, then apply firewall changes
+
+<img width="208" height="262" alt="image" src="https://github.com/user-attachments/assets/0dec8b46-74f6-428c-b861-7a2306d3d413" />
+
+# Management access
+
+Why: You need SSH to both boxes, plus the Nessus (8834) and Caldera (8888) web UIs, from the management PC only.
+
+Firewall > Aliases > Add: ATK_MGMT_PORTS (Port(s)) = 22, 8834, 8888
+
+Then add a new rule passing TCP from management pc to ATTACKER_HOSTS through these above ports
+
+Then add the new rule `route -p add 10.0.50.0 mask 255.255.255.0 192.168.0.254`
+
+Then download the Kali ISO from Proxmox 
+
+Get the check sum and download from `https://cdimage.kali.org/current/`
+
+# Kali VM creation
+
+`qm create 140 --name atk-kali-01 --ostype l26 --cores 2 --cpu host --memory 4096 --balloon 0 --scsihw virtio-scsi-single --scsi0 lab-storage:80,format=qcow2,discard=on,ssd=1 --net0 virtio,bridge=vmbr40,firewall=0 --ide2 local:iso/kali-linux-2026.2-installer-amd64.iso,media=cdrom --boot order='scsi0;ide2' --agent enabled=1`
+
+Then start it up
+
+<img width="541" height="279" alt="image" src="https://github.com/user-attachments/assets/e3c1365d-b089-439a-a992-e90128732771" />
 
 
+First check the network
 
+<img width="199" height="72" alt="image" src="https://github.com/user-attachments/assets/5f2ef05b-b0aa-4237-8470-4e305656be17" />
 
+Configure the static IP in the interfaces file `sudo nano /etc/network/interfaces`
 
+<img width="247" height="142" alt="image" src="https://github.com/user-attachments/assets/5ce068e1-9231-41d9-a185-ea3555211eef" />
 
+`echo "nameserver 10.0.50.1" | sudo tee /etc/resolv.conf`
 
+`sudo systemctl restart networking`
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<img width="262" height="59" alt="image" src="https://github.com/user-attachments/assets/67eeb326-ea5c-4154-b7e6-fdf7b2453be1" />
 
 
 

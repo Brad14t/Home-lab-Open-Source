@@ -92,6 +92,130 @@ Configure the static IP in the interfaces file `sudo nano /etc/network/interface
 
 <img width="262" height="59" alt="image" src="https://github.com/user-attachments/assets/67eeb326-ea5c-4154-b7e6-fdf7b2453be1" />
 
+Then `sudo systemctl enable --now ssh`
+
+`sudo apt update && sudo apt install -y qemu-guest-agent && sudo systemctl start qemu-guest-agent`
+
+Run a couple of connection test that should pass
+
+`ping -c 3 10.0.40.10` and `ping -c 3 8.8.8.8`
+
+These should fail
+
+`ping -c 3 10.0.30.10` and `ping -c 3 10.0.20.10`
+
+<img width="274" height="238" alt="image" src="https://github.com/user-attachments/assets/b1192642-8a4e-4e2d-afd6-26b251c52dc1" />
+
+# Caldera on Kali
+
+Why: Caldera is MITRE’s adversary emulation platform. It runs ATT&CK-mapped attack chains through agents, which gives you repeatable attacks to test detections against in Phase 6.
+
+
+Install Caldera from the Kali repo: `sudo apt install -y caldera`
+
+this generates a secure config with random credentials: `sudo caldera`
+
+Leave that session running and start a new SSH session into the kali box
+
+Find the generated config: `sudo find / -name local.yml -path '*caldera*' 2>/dev/null`
+
+Show the users section (replace the path with the one you found): `sudo grep -A6 '^users' <path-to-local.yml>`
+
+Save the red password
+
+Confirm the web UI is listening: `ss -tlnp | grep 8888`
+
+<img width="235" height="46" alt="image" src="https://github.com/user-attachments/assets/ee243422-6e68-417f-aee1-e6ebb87db92b" />
+
+Then, from a browser on the management PC, go to http://10.0.50.10:8888 and log in as red.
+
+<img width="957" height="425" alt="image" src="https://github.com/user-attachments/assets/5cef1ff0-7811-4045-b7a5-7665487e7690" />
+
+# Run Caldera as a service
+
+Why: Right now Caldera dies when you close the first SSH session. A systemd service starts it on boot and restarts it if it crashes.
+
+Confirm the Caldera binary path: `which caldera`
+
+Create the service file: `sudo nano /etc/systemd/system/caldera.service`
+
+Paste this:
+
+`[Unit]
+Description=MITRE Caldera adversary emulation server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/caldera
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target`
+
+Load the new unit file: `sudo systemctl daemon-reload`
+
+Enable at boot and start now: `sudo systemctl enable --now caldera`
+
+Watch the startup log until “All systems ready,” then press Ctrl+C: `sudo journalctl -u caldera -f`
+
+<img width="484" height="202" alt="image" src="https://github.com/user-attachments/assets/0274c8ea-1669-487e-ad3d-1354cd8467cf" />
+
+Confirm the web UI port is listening: `ss -tlnp | grep 8888`
+
+<img width="235" height="36" alt="image" src="https://github.com/user-attachments/assets/e745c976-390e-48dd-a751-a74ba6943a8c" />
+
+Reboot test, Reboot Kali: `sudo reboot`
+
+I had to resetup ssh from the proxmox conxole
+
+Then confirm caldera came back on: `systemctl is-active caldera`
+
+Then snapshot
+
+Writeup note: Caldera runs as root here for simplicity. In production you’d run it as a dedicated service account with only the permissions it needs.
+
+Next up is VM 141, the Nessus Essentials scanner. Before we start that, get a free activation code at tenable.com (Nessus Essentials registration). The code arrives by email.
+
+Register for a Nexxas account and `Download by curl` once you get to the download site.
+
+<img width="542" height="390" alt="image" src="https://github.com/user-attachments/assets/4d9c3a69-6cdf-422b-8622-c76f1636c2f8" />
+
+# Create VM 141 (Nessus scanner)
+
+Why: this is a dedicated Ubuntu VM for Nessus, so plugin compilation and scans don’t compete with Kali for RAM.
+
+Create the VM on the ATTACKER bridge with the standard lab settings:
+
+`qm create 141 --name atk-nessus-01 --ostype l26 --cores 2 --cpu host --memory 6144 --balloon 0 --scsihw virtio-scsi-single --scsi0 lab-storage:40,format=qcow2,discard=on,ssd=1 --net0 virtio,bridge=vmbr40,firewall=0 --ide2 local:iso/ubuntu-24.04.3-live-server-amd64.iso,media=cdrom --boot order='scsi0;ide2' --agent enabled=1`
+
+Then start it.
+
+<img width="516" height="186" alt="image" src="https://github.com/user-attachments/assets/4aedd052-6d40-45a1-be2c-afb6661866c3" />
+
+
+<img width="252" height="124" alt="image" src="https://github.com/user-attachments/assets/92ce0150-2f50-4cd6-89b8-acddc3438626" />
+
+<img width="463" height="208" alt="image" src="https://github.com/user-attachments/assets/edd4a4cb-42f4-4d5b-a412-391965576f31" />
+
+<img width="326" height="238" alt="image" src="https://github.com/user-attachments/assets/5c4fc7e4-5a79-493b-8e72-1889c24aa236" />
+
+<img width="413" height="154" alt="image" src="https://github.com/user-attachments/assets/d138e347-7be5-4c9b-89b4-fe6424373787" />
+
+One in update all packages: `sudo apt update && sudo apt upgrade -y`
+
+Install and start the Proxmox guest agent: `sudo apt install -y qemu-guest-agent && sudo systemctl enable --now qemu-guest-agent`
+
+Confrim it can pass `ping -c 3 10.0.40.10`
+
+Then snapshot `phase5-nessus-fresh-install`
+
+
+
+
 
 
 

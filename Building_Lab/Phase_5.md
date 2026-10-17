@@ -213,6 +213,48 @@ Confrim it can pass `ping -c 3 10.0.40.10`
 
 Then snapshot `phase5-nessus-fresh-install`
 
+# Install and activate Nessus Essentials
+
+Download the Nessus installer (paste the “Download by curl” command from Tenable’s page, Linux - Ubuntu - amd64):
+
+`curl --request GET \
+  --url 'https://www.tenable.com/downloads/api/v2/pages/nessus/files/Nessus-10.12.5-ubuntu1604_amd64.deb' \
+  --output 'Nessus-10.12.5-ubuntu1604_amd64.deb'`
+
+Install the package: `sudo dpkg -i Nessus-*.deb`
+
+Enable Nessus at boot and start it now: `sudo systemctl enable --now nessusd`
+
+Confirm the web UI is listening on 8834: `ss -tlnp | grep 8834`
+
+<img width="274" height="42" alt="image" src="https://github.com/user-attachments/assets/56065433-cbe6-4239-964b-fbf3a4171916" />
+
+
+Activate in the browser (management PC)
+Go to https://10.0.50.11:8834 and accept the self-signed certificate warning.
+Choose Register for Nessus Essentials, skip the registration form, and enter the activation code from your email.
+Create the admin user and store the password in your password manager.
+Plugin download and compile: this takes 20-60 minutes. Don’t close the page, restart the service, or reboot until the dashboard loads.
+
+
+Once in:
+
+<img width="665" height="370" alt="image" src="https://github.com/user-attachments/assets/79ddfa8c-94f9-43a2-8e4d-81c3ee84b52a" />
+
+Create the scan
+Close the welcome dialog with the X.
+Go to Scans > New Scan > Basic Network Scan.
+Fill in:
+Name: Phase5 - VULNERABLE baseline
+Description: Uncredentialed baseline of vulnerable VLAN
+Targets: 10.0.40.10, 10.0.40.20
+Click Save, then click Launch (the ▶ icon) on the scan.
+
+
+
+
+
+
 
 
 

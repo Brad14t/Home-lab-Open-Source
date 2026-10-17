@@ -250,20 +250,32 @@ Description: Uncredentialed baseline of vulnerable VLAN
 Targets: 10.0.40.10, 10.0.40.20
 Click Save, then click Launch (the ▶ icon) on the scan.
 
+<img width="321" height="268" alt="image" src="https://github.com/user-attachments/assets/0d2bfe28-6c5d-4bac-8d38-2345b8203289" />
 
+<img width="474" height="321" alt="image" src="https://github.com/user-attachments/assets/a42a4add-7013-4c9c-96b8-a2ff4ea210cb" />
 
+<img width="861" height="115" alt="image" src="https://github.com/user-attachments/assets/bfb7eb75-f3c4-4075-89c1-5293f4477935" />
 
+Watch the blue side while it runs
 
+Why: this is your first end-to-end test. A real attack tool crosses the firewall, and the defensive tools should see it.
 
+pfSense > Services > Suricata > Alerts (Instance: VULNERABLE): expect scan and exploit-probe alerts with source 10.0.50.11.
+Wazuh > agent 005 (vuln-docker-01): you may see web, auth, or connection-related events from the probing.
 
+<img width="460" height="425" alt="image" src="https://github.com/user-attachments/assets/eb344738-c6cb-4dda-ad1c-160c99b94c5d" />
 
+<img width="747" height="365" alt="image" src="https://github.com/user-attachments/assets/525814b6-2e56-45e3-9929-00b30f4b38f4" />
 
+What to expect in the results
+- 10.0.40.20 (Metasploitable 2): a long list of criticals, such as the vsftpd 2.3.4 backdoor, UnrealIRCd backdoor, distcc, Samba, and an outdated SSL/SSH config. That’s all expected.
+- 10.0.40.10 (docker host): far fewer findings, since it’s a patched Ubuntu host. Most findings will come from the DVWA and bWAPP web services on 8080 and 8081.
 
+<img width="846" height="252" alt="image" src="https://github.com/user-attachments/assets/c206c611-6da9-4432-b154-579033134a01" />
 
+<img width="565" height="364" alt="image" src="https://github.com/user-attachments/assets/ba63ca9d-3ed2-43cb-a996-8f6ba839e7bb" />
 
-
-
-
+This concludes phase 5.
 
 
 

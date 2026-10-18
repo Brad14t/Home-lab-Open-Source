@@ -6,7 +6,11 @@ A fully segmented, home-built security operations lab for practicing **detection
 
 ## Network Architecture
 
+**Live purple-team detection flow:**
+
 <img width="762" height="515" alt="PurpleTeamFlow" src="https://github.com/user-attachments/assets/3b2e7132-2b41-495a-8968-1243dd76cf5f" />
+
+**Network Diagram**
 
 ```mermaid
 flowchart TB

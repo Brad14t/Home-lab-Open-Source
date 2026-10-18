@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blue Team Lab — Purple-Team Detection Flow</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0d1117;
+    font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+  .card {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 12px;
+    padding: 20px 16px;
+  }
+  @keyframes dash { to { stroke-dashoffset: -32; } }
+  .flowpath { stroke-dasharray: 6 6; animation: dash 1.1s linear infinite; }
+  .lbl { fill: #8b949e; font-size: 11px; }
+  .lblw { fill: #c9d1d9; font-size: 12px; font-weight: 500; }
+  .zone { fill: none; stroke-width: 1; }
+  .zt { font-size: 10px; letter-spacing: .5px; }
+  @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:.25} }
+  .live { animation: blink 1s step-end infinite; }
+  @keyframes travel {
+    0%  { offset-distance:0%;   opacity:0; }
+    4%  { opacity:1; }
+    30% { offset-distance:100%; opacity:1; }
+    36% { offset-distance:100%; opacity:0; }
+    100%{ offset-distance:100%; opacity:0; }
+  }
+  .packet { animation: travel 4.5s linear infinite; }
+  @keyframes blockpop { 0%,28%{opacity:0} 34%,52%{opacity:1} 60%,100%{opacity:0} }
+  .blockmark circle, .blockmark path { animation: blockpop 4.5s ease-in-out infinite; }
+  @keyframes detpop { 0%,30%{opacity:0} 38%,56%{opacity:1} 64%,100%{opacity:0} }
+  .detfire { animation: detpop 4.5s ease-in-out infinite; }
+  @keyframes socglow { 0%,32%{opacity:.3} 46%,88%{opacity:1} 100%{opacity:.3} }
+  .socwake { animation: socglow 4.5s ease-in-out infinite; }
+  @keyframes travel2 {
+    0%,52%  { offset-distance:0%;   opacity:0; }
+    56%     { opacity:1; }
+    80%     { offset-distance:100%; opacity:1; }
+    86%     { offset-distance:100%; opacity:0; }
+    100%    { offset-distance:100%; opacity:0; }
+  }
+  .packet2 { animation: travel2 4.5s linear infinite; }
+  @keyframes casepop { 0%,78%{opacity:0} 84%,96%{opacity:1} 100%{opacity:0} }
+  .casemade { animation: casepop 4.5s ease-in-out infinite; }
+  text { font-family: ui-monospace, "SFMono-Regular", "Cascadia Code", Menlo, Consolas, monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<svg width="100%" viewBox="0 0 680 440" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Blue team lab purple-team flow</title>
+<desc>An attack from the Kali box is blocked by pfSense, fires a detection, and a case is created in TheHive inside the SOC zone.</desc>
+<defs>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<text class="zt" x="40" y="28" fill="#f85149" letter-spacing="1">PURPLE-TEAM DETECTION FLOW</text>
+
+<rect class="zone" x="40" y="300" width="190" height="110" rx="10" stroke="#f85149"/>
+<text class="zt" x="52" y="320" fill="#f85149">ATTACKER · 10.0.50.0/24</text>
+<rect x="64" y="332" width="140" height="48" rx="6" fill="#2d1113" stroke="#f85149" stroke-width="1"/>
+<text class="lblw" x="134" y="352" text-anchor="middle" fill="#ff7b72">atk-kali-01</text>
+<text class="lbl" x="134" y="368" text-anchor="middle">Kali + Caldera</text>
+
+<rect x="272" y="192" width="96" height="60" rx="8" fill="#1c2128" stroke="#58a6ff" stroke-width="1.2"/>
+<text class="lblw" x="320" y="216" text-anchor="middle" fill="#79c0ff">pfSense</text>
+<text class="lbl" x="320" y="232" text-anchor="middle">soc-fw-01</text>
+<text class="lbl" x="320" y="245" text-anchor="middle" fill="#f85149">● segmentation</text>
+
+<rect class="zone" x="430" y="58" width="210" height="108" rx="10" stroke="#d29922"/>
+<text class="zt" x="442" y="78" fill="#d29922">CORPORATE · 10.0.30.0/24</text>
+<rect x="462" y="90" width="150" height="46" rx="6" fill="#241e10" stroke="#d29922" stroke-width="1"/>
+<text class="lblw" x="537" y="110" text-anchor="middle" fill="#e3b341">DC01 / DC02</text>
+<text class="lbl" x="537" y="125" text-anchor="middle">Active Directory</text>
+
+<rect class="zone socwake" x="430" y="246" width="210" height="160" rx="10" stroke="#3fb950"/>
+<text class="zt" x="442" y="266" fill="#3fb950">SECURITY (SOC) · 10.0.20.0/24</text>
+<rect x="452" y="278" width="168" height="30" rx="5" fill="#0f2417" stroke="#3fb950" stroke-width="1"/>
+<text class="lblw" x="464" y="297" fill="#56d364">Suricata + Wazuh</text>
+<rect x="452" y="358" width="168" height="30" rx="5" fill="#0f2417" stroke="#3fb950" stroke-width="1"/>
+<text class="lblw" x="464" y="377" fill="#56d364">TheHive case</text>
+
+<path class="flowpath" d="M134 332 L290 252" fill="none" stroke="#f85149" stroke-width="1.5" opacity=".5"/>
+<path class="flowpath" d="M345 192 L490 136" fill="none" stroke="#f85149" stroke-width="1.5" opacity=".35"/>
+<path d="M352 250 L450 291" fill="none" stroke="#3fb950" stroke-width="1.5" opacity=".65" marker-end="url(#ar)"/>
+<path d="M536 310 L536 356" fill="none" stroke="#3fb950" stroke-width="1.5" opacity=".65" marker-end="url(#ar)"/>
+
+<circle class="packet" r="5" fill="#ff7b72" style="offset-path:path('M134 332 L290 252');"/>
+
+<g class="blockmark" transform="translate(417,164)">
+<circle r="11" fill="#2d1113" stroke="#f85149" stroke-width="1.5"/>
+<path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#f85149" stroke-width="2" stroke-linecap="round"/>
+</g>
+<text class="lbl detfire" x="417" y="190" text-anchor="middle" fill="#f85149">BLOCKED at perimeter</text>
+
+<text class="lbl detfire" x="360" y="300" text-anchor="middle" fill="#56d364">detection fires</text>
+
+<circle class="packet2" r="4.5" fill="#56d364" style="offset-path:path('M536 310 L536 356');"/>
+<text class="lbl casemade" x="536" y="403" text-anchor="middle" fill="#56d364">case created</text>
+
+<circle class="live" cx="628" cy="259" r="4" fill="#3fb950"/>
+</svg>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Never commit secrets or raw captures that may contain them
+*.pcap
+*.pcapng
+secrets.*
+*.key
+*.pem
+credentials*
+
+# Large/raw exports — commit curated excerpts instead
+*.evtx
+raw-logs/

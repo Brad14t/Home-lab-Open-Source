@@ -1,7 +1,10 @@
+# Home SOC & Blue Team Lab
+ 
+A fully segmented, home-built security operations lab for practicing **detection engineering and purple-team work** — attacking intentionally vulnerable systems, then proving the attacks are caught with host and network telemetry. Built on Proxmox with free and open-source tooling ($0 budget), modeled after a production enterprise network.
 
+---
 
-
-
+## Network Architecture
 
 <img width="762" height="515" alt="PurpleTeamFlow" src="https://github.com/user-attachments/assets/3b2e7132-2b41-495a-8968-1243dd76cf5f" />
 

@@ -1,4 +1,4 @@
-# Build Log
+# Summarized Build Log
 
 Condensed summary of how the lab was built, phase by phase. This is the "what and why," not a step-by-step tutorial.
 

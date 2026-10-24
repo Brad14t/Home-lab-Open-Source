@@ -112,7 +112,7 @@ impacket-GetUserSPNs lab.local/jcarter:'<password>' -dc-ip 10.0.30.10 -request
 [-] Principal: lab.local\svc-sql - Kerberos SessionError: KDC_ERR_ETYPE_NOSUPP (KDC has no support for encryption type)
 ```
 
-![RC4 Kerberoast attempt rejected](evidence/01-rc4-attempt-failed.png)
+<img width="479" height="73" alt="image" src="https://github.com/user-attachments/assets/ddff7ceb-91cc-4dda-a8fd-d8860fb7d758" />
 
 ### Why it failed (the finding)
 
@@ -162,7 +162,7 @@ klist get MSSQLSvc/sql01.lab.local:1433
 (`KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96`). The attack succeeded against
 the hardened domain — just with a cipher that's slower (but not impossible) to crack.
 
-![Service ticket issued (AES-256)](evidence/03-klist-get-success.png)
+<img width="370" height="91" alt="image" src="https://github.com/user-attachments/assets/1f0486fe-2f61-411c-821d-39496ad9e4e2" />
 
 ---
 
@@ -190,7 +190,7 @@ fingerprints:
 
 (`0x12` = AES256; `10.0.30.102` = WS01.)
 
-![Raw Event 4769 captured by Wazuh](evidence/04-wazuh-raw-4769.png)
+<img width="478" height="195" alt="image" src="https://github.com/user-attachments/assets/4097ee01-5f83-40af-9c70-763788e2a753" />
 
 ### The detection rules
 
@@ -226,7 +226,9 @@ Added to Wazuh's `local_rules.xml`:
 After deploying the rules and re-running the attack, rule `100131` fired at level 10,
 naming `svc-sql`, `jcarter`, and the source workstation.
 
-![Wazuh alert — rule 100131 fired](evidence/05-wazuh-alert-fired.png)
+<img width="171" height="45" alt="image" src="https://github.com/user-attachments/assets/61e59e68-6c7b-4f45-a710-d6351aaf8ff3" />
+
+<img width="767" height="244" alt="image" src="https://github.com/user-attachments/assets/ae890777-6980-4887-a9f7-0fd860197560" />
 
 ---
 

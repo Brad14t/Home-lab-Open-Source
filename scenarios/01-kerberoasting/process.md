@@ -79,23 +79,7 @@ impacket-GetUserSPNs lab.local/<user>:'<password>' -dc-ip 10.0.30.10 -request -o
 
 </details>
 
-What each part means:
-- `lab.local/<user>:<password>` — logging in as an ordinary domain user
-- `-dc-ip 10.0.30.10` — points straight at the domain controller (the KDC)
-- `-request` — actually pulls the crackable ticket, not just a list of accounts
-- `-outputfile` — saves the ticket hash to a file
 
-> Never commit real credentials. The `<user>`/`<password>` placeholders stay as
-> placeholders in this repo.
-
-### What came back
-
-<!-- FILL AFTER RUNNING: the svc-sql row with SPN MSSQLSvc/sql01.lab.local:1433,
-     and a hash beginning with $krb5tgs$23$ -->
-
-The `$23$` at the start of the hash means **RC4** encryption — the weak setting that
-makes this crackable. An attacker would now feed this file to an offline cracker
-like Hashcat.
 
 ### The blue-team takeaway (what matters for detection)
 

@@ -49,7 +49,7 @@ echo "10.0.30.10  dc01.lab.local lab.local" | sudo tee -a /etc/hosts
 ```
 
 <details>
-<summary>Click here to expand the dropdown</summary>
+<summary>Command explained:</summary>
 
 ### This is hidden content!
 You can put text, lists, images, or even code blocks inside this section.

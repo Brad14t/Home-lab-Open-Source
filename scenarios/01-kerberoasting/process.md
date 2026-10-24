@@ -60,13 +60,22 @@ echo "10.0.30.10  dc01.lab.local lab.local" | sudo tee -a /etc/hosts
 </details>
 
 
-
 Then I requested the service ticket, authenticating as a normal, non-admin domain
 user — that's all Kerberoasting needs:
 
 ```bash
 impacket-GetUserSPNs lab.local/<user>:'<password>' -dc-ip 10.0.30.10 -request -outputfile kerberoast.hashes
 ```
+<details>
+<summary>Command explained:</summary>
+
+| Command Component | What it does |
+| :--- | :--- |
+| `impacket-GetUserSPNs` | **What it does:** A tool from the Impacket framework specifically designed to find and target accounts that have Service Principal Names (SPNs) registered in Active Directory. |
+| `lab.local/<user>:'<password>'` | **What it does:**  Authenticates to the domain using valid low-privileged domain credentials. |
+| `-dc-ip 10.0.30.10` | **What it does:** Specifies the IP address of the Domain Controller (DC) to talk to. In this case, it targets 10.0.30.10 (the host added to your system's host file in the previous step). |
+
+</details>
 
 What each part means:
 - `lab.local/<user>:<password>` — logging in as an ordinary domain user

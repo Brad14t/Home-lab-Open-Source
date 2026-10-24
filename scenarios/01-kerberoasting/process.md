@@ -54,9 +54,15 @@ echo "10.0.30.10  dc01.lab.local lab.local" | sudo tee -a /etc/hosts
 ### This is hidden content!
 You can put text, lists, images, or even code blocks inside this section.
 
-```bash
-echo "Hello World"
-```
+| Command Component | What it does |
+| :--- | :--- |
+| `docker-compose exec` | Runs a command inside a currently running Docker container. |
+| `-d` | **Detached mode:** Runs the command in the background. |
+| `db` | The name of the specific service/container defined in your `docker-compose.yml`. |
+| `pg_dump` | The native PostgreSQL utility used to export/backup a database. |
+| `-U postgres_user` | Specifies the database username to connect with. |
+| `-t users` | **Target table:** Restricts the dump to only extract the `users` table. |
+| `my_database` | The target database name you are backing up. |
 </details>
 
 

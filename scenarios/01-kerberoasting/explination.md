@@ -1,47 +1,270 @@
-## Scenario 01 — Kerberoasting
+# Scenario 01 — Kerberoasting
 
-### What this attack is (in plain terms)
+> Requesting a service account's Kerberos ticket as an ordinary domain user, to crack
+> its password offline. This lab shows the classic version being blocked by modern AD
+> hardening, the attack succeeding via a living-off-the-land method instead, and a
+> Wazuh detection that catches it regardless of encryption.
 
-Active Directory uses a system called **Kerberos** to let users prove who they are
-without sending their password across the network every time. Instead of passwords,
-it hands out encrypted **tickets**.
+| | |
+|---|---|
+| **MITRE ATT&CK** | T1558.003 — Steal or Forge Kerberos Tickets: Kerberoasting |
+| **Tactic** | Credential Access |
+| **Target** | `svc-sql` — SPN `MSSQLSvc/sql01.lab.local:1433` |
+| **Attacker start** | `atk-kali-01` · 10.0.50.10 (classic attempt) |
+| **Attacker (successful)** | `WS01` · 10.0.30.102, as compromised user `jcarter` |
+| **Detection source** | Wazuh custom rules `100130`/`100131` on Windows Event 4769 |
+| **Status** | ✅ Detected (AES variant, encryption-agnostic rule) |
+| **Time to detect** | `<attack time>` → `<alert time>` (near real-time) |
 
-Some accounts in a domain are **service accounts** — accounts that run background
-services like a database. Each is tagged with an **SPN** (Service Principal Name),
-a label that says "this account runs this service."
+---
 
-Here's the weakness: **any** logged-in domain user — even a low-privilege one — is
-allowed to ask the domain controller for a service ticket for any SPN. That ticket
-is encrypted with the service account's password. If the account uses older **RC4**
-encryption, an attacker can take the ticket back to their own machine and try
-millions of password guesses against it **offline**, where no defender can see it.
+## What this attack is (in plain terms)
 
-This technique is **Kerberoasting** (MITRE ATT&CK **T1558.003**). Attackers like it
-because:
-- It only needs one ordinary domain account to start.
-- The password cracking happens offline, so it's silent.
-- Service accounts often have weak, never-changing passwords and high privileges.
+Active Directory uses **Kerberos** to prove who users are without sending passwords
+across the network. Instead of passwords, it issues encrypted **tickets**.
 
-> **Why document the attack in a blue-team project?** I can't build a good detection
-> for something I don't understand. The goal isn't the attack — it's seeing exactly
-> what trace it leaves so I can catch it.
+Some accounts run background services (a database, a backup job). Each is tagged with
+an **SPN** (Service Principal Name) — a label saying "this account runs this service."
+The weakness: **any** logged-in domain user can ask the domain controller for a
+service ticket for any SPN, and that ticket is encrypted with the service account's
+password. The attacker takes it to their own machine and guesses the password
+**offline**, where no defender can see the guessing.
 
-### The target
+This is **Kerberoasting**. Attackers favor it because it needs only one ordinary
+account, the cracking is silent, and service accounts often have weak, never-changing
+passwords with high privileges.
+
+> **Why a blue-team project documents the attack:** I can't detect what I don't
+> understand. The goal is to see the exact trace the attack leaves so I can catch it.
+
+---
+
+## The target
 
 | | |
 |---|---|
 | Account | `svc-sql` |
 | SPN | `MSSQLSvc/sql01.lab.local:1433` |
-| Weakness | RC4 encryption, weak password that never expires |
+| Weakness | Service account with an SPN and a crackable password |
 
-This account was **deliberately misconfigured** in the lab to be roastable, so there's
-something realistic to detect.
+`svc-sql` was deliberately created with an SPN so it would be roastable. There's no
+real database behind `sql01.lab.local` — it's a decoy that exists to be attacked and
+detected.
 
+---
 
-### The blue-team takeaway (what matters for detection)
+## Prerequisites & scope
 
-The cracking is invisible, but the **ticket request is not**. The moment the tool
-asked the domain controller for that ticket, Windows logged it as **Event ID 4769**,
-and recorded that the ticket used **RC4** encryption. Legitimate modern tickets use
-AES, so an RC4 service-ticket request stands out. That's the signal the next section
-detects.
+- **Temporary firewall rule:** `atk-kali-01` (10.0.50.10) → `DC01` (10.0.30.10) on
+  TCP 88 (Kerberos) and 389 (LDAP), for the initial Kali attempt. Disabled before
+  and after the run.
+- **Logging:** Kerberos service-ticket auditing (Event 4769) is enabled domain-wide
+  via GPO, and `DC01` runs a Wazuh agent forwarding the Security log.
+- **VM set booted:** 100 (pfSense), 101 (Wazuh), 110 (DC01), 120 (WS01), 140 (Kali).
+
+> **Teardown:** the temporary Kali→DC rule is disabled immediately after the run.
+
+---
+
+## Attack, part 1 — the classic RC4 roast (and why it failed)
+
+The standard Kerberoast uses **Impacket's GetUserSPNs** from Kali. Because the
+attacker box can't use the domain's DNS, I first mapped the domain controller by name.
+
+From Kali:
+
+```bash
+echo "10.0.30.10  dc01.lab.local lab.local" | sudo tee -a /etc/hosts
+```
+
+<details>
+<summary>Command explained</summary>
+
+| Component | What it does |
+| :--- | :--- |
+| `echo "10.0.30.10 dc01.lab.local lab.local"` | One host-file line: `[IP] [hostname] [alias]`, mapping the DC's IP to its names. |
+| `\| sudo tee -a /etc/hosts` | Appends (`-a`) that line to the system hosts file with admin rights. |
+
+</details>
+
+Then I requested the service ticket, authenticated as an ordinary domain user
+(`jcarter`):
+
+```bash
+impacket-GetUserSPNs lab.local/jcarter:'<password>' -dc-ip 10.0.30.10 -request
+```
+
+<details>
+<summary>Command explained</summary>
+
+| Component | What it does |
+| :--- | :--- |
+| `impacket-GetUserSPNs` | Finds accounts with SPNs and can request their tickets. |
+| `lab.local/jcarter:'<password>'` | Logs in as an ordinary domain user — no admin rights needed. |
+| `-dc-ip 10.0.30.10` | Points at the domain controller directly (no DNS dependency). |
+| `-request` | Actually requests the crackable ticket, not just a list. |
+
+</details>
+
+**Result:** the tool found `svc-sql` and its SPN, but the ticket request was rejected:
+
+```
+[-] Principal: lab.local\svc-sql - Kerberos SessionError: KDC_ERR_ETYPE_NOSUPP (KDC has no support for encryption type)
+```
+
+![RC4 Kerberoast attempt rejected](evidence/01-rc4-attempt-failed.png)
+
+### Why it failed (the finding)
+
+`KDC_ERR_ETYPE_NOSUPP` means the domain controller refused to issue an **RC4**-encrypted
+ticket. Impacket requests RC4 by default (RC4 is the easiest to crack), but **Windows
+Server 2025 disables RC4 by default.** I tried to force the classic attack through:
+
+- Set the account to allow RC4: `Set-ADUser svc-sql -KerberosEncryptionType RC4,AES128,AES256`
+- Allowed RC4 at the domain-controller policy ("Network security: Configure encryption
+  types allowed for Kerberos")
+- Reset the account password so its keys would regenerate
+
+**It still failed.** RC4 is deprecated deeply enough in modern AD that re-enabling it
+at the account level, the policy level, and rotating the password was not enough to
+get the KDC to issue an RC4 ticket. 
+
+**Takeaway:** a modern domain resists the textbook RC4 Kerberoast by default. An
+attacker has to fall back to AES — and, importantly, a detection built only around
+"RC4 is bad" would be blind to what comes next.
+
+---
+
+## Attack, part 2 — the working AES roast (living off the land)
+
+Instead of attacker tooling, a service ticket can be requested with **built-in Windows
+functionality** from any domain workstation. This is how a real attacker on a
+compromised machine operates — no tools to install, nothing for antivirus to catch —
+and it automatically uses AES, which the domain *does* support.
+
+From `WS01`, logged in as the compromised user `jcarter`:
+
+```
+klist get MSSQLSvc/sql01.lab.local:1433
+```
+
+<details>
+<summary>Command explained</summary>
+
+| Component | What it does |
+| :--- | :--- |
+| `klist` | Built-in Windows tool for viewing and managing Kerberos tickets. |
+| `get MSSQLSvc/sql01.lab.local:1433` | Requests and caches a service ticket for that SPN. Requesting it **is** the Kerberoast action — the DC logs Event 4769. |
+
+</details>
+
+**Result:** the DC issued the ticket, encrypted with AES-256
+(`KerbTicket Encryption Type: AES-256-CTS-HMAC-SHA1-96`). The attack succeeded against
+the hardened domain — just with a cipher that's slower (but not impossible) to crack.
+
+![Service ticket issued (AES-256)](evidence/03-klist-get-success.png)
+
+---
+
+## Detection
+
+Event 4769 fires on the domain controller for *every* service-ticket request —
+thousands a day, almost all legitimate. A useful detection has to separate the attack
+from that noise. Two signals do it:
+
+1. **RC4 encryption (`0x17`)** — the classic tell. Kept as a high-severity rule, though
+   in this hardened domain it won't fire (the lesson from part 1).
+2. **Requests for sensitive service accounts** — an ordinary user should never need a
+   ticket for `svc-sql` or `svc-backup`. Any 4769 naming them, *regardless of
+   encryption*, is worth an alert. This is what catches the AES attack.
+
+### Confirming Wazuh saw the event
+
+With full logging enabled temporarily, the raw 4769 event showed the attack's
+fingerprints:
+
+```json
+"serviceName": "svc-sql", "ticketEncryptionType": "0x12",
+"targetUserName": "jcarter@LAB.LOCAL", "ipAddress": "::ffff:10.0.30.102"
+```
+
+(`0x12` = AES256; `10.0.30.102` = WS01.)
+
+![Raw Event 4769 captured by Wazuh](evidence/04-wazuh-raw-4769.png)
+
+### The detection rules
+
+Added to Wazuh's `local_rules.xml`:
+
+```xml
+<group name="windows,kerberoasting,">
+
+  <rule id="100130" level="12">
+    <decoded_as>windows_eventchannel</decoded_as>
+    <field name="win.system.eventID">^4769$</field>
+    <field name="win.eventdata.ticketEncryptionType">^0x17$</field>
+    <description>Possible Kerberoasting (RC4 ticket): $(win.eventdata.serviceName) requested by $(win.eventdata.targetUserName) from $(win.eventdata.ipAddress)</description>
+    <mitre><id>T1558.003</id></mitre>
+  </rule>
+
+  <rule id="100131" level="10">
+    <decoded_as>windows_eventchannel</decoded_as>
+    <field name="win.system.eventID">^4769$</field>
+    <field name="win.eventdata.serviceName">^svc-sql$|^svc-backup$</field>
+    <description>Possible Kerberoasting (monitored service account): $(win.eventdata.serviceName) ticket requested by $(win.eventdata.targetUserName) from $(win.eventdata.ipAddress)</description>
+    <mitre><id>T1558.003</id></mitre>
+  </rule>
+
+</group>
+```
+
+| Rule | Fires when | Level | Catches |
+| :--- | :--- | :--- | :--- |
+| `100130` | 4769 + RC4 (`0x17`) | 12 | Classic RC4 roast (won't fire in this AES-hardened domain) |
+| `100131` | 4769 naming `svc-sql`/`svc-backup` | 10 | The AES attack run here — encryption-agnostic |
+
+After deploying the rules and re-running the attack, rule `100131` fired at level 10,
+naming `svc-sql`, `jcarter`, and the source workstation.
+
+![Wazuh alert — rule 100131 fired](evidence/05-wazuh-alert-fired.png)
+
+---
+
+## Analysis
+
+- **The modern default already helped the defender.** The textbook RC4 attack was
+  blocked outright. The attack only worked by moving to AES — which cracks far slower,
+  buying defenders time.
+- **Encryption-agnostic detection matters.** A rule that only looks for RC4 would have
+  missed this entirely. Watching for *who* is asking for *which* service account is the
+  more durable signal.
+- **The attack was toolless.** The successful request used only built-in Windows
+  commands, so endpoint antivirus had nothing to flag. The detection had to come from
+  the domain controller's own logs — which is exactly why SIEM visibility into 4769
+  matters.
+- **This was a single request.** A real roast often pulls *many* service accounts at
+  once. A strong follow-up detection is a frequency rule: one user requesting tickets
+  for many distinct service accounts in a short window (a future addition).
+
+---
+
+## Remediation & hardening
+
+- **Use group Managed Service Accounts (gMSAs)** for service accounts. They use
+  long (120-character), automatically-rotated passwords that are effectively
+  uncrackable.
+- **Keep RC4 disabled** (it already is here) and enforce AES — it slows cracking
+  dramatically.
+- **Give service accounts long, random passwords** (25+ characters) if gMSA isn't an
+  option, so even an AES ticket is impractical to crack.
+- **Least privilege:** service accounts should not be in privileged groups — a cracked
+  low-privilege account is far less damaging.
+- **Detect, don't just prevent:** alert on 4769 for sensitive service accounts, on RC4
+  ticket requests anywhere, and on one user requesting many SPNs quickly.
+
+---
+
+## References
+
+- [MITRE ATT&CK T1558.003 — Kerberoasting](https://attack.mitre.org/techniques/T1558/003/)
+- Microsoft — [4769(S, F): A Kerberos service ticket was requested](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4769)

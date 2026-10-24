@@ -51,18 +51,12 @@ echo "10.0.30.10  dc01.lab.local lab.local" | sudo tee -a /etc/hosts
 <details>
 <summary>Command explained:</summary>
 
-### This is hidden content!
-You can put text, lists, images, or even code blocks inside this section.
-
 | Command Component | What it does |
 | :--- | :--- |
-| `docker-compose exec` | Runs a command inside a currently running Docker container. |
-| `-d` | **Detached mode:** Runs the command in the background. |
-| `db` | The name of the specific service/container defined in your `docker-compose.yml`. |
-| `pg_dump` | The native PostgreSQL utility used to export/backup a database. |
-| `-U postgres_user` | Specifies the database username to connect with. |
-| `-t users` | **Target table:** Restricts the dump to only extract the `users` table. |
-| `my_database` | The target database name you are backing up. |
+| `echo` | **What it does:** Prints the text inside the quotes to the standard output. |
+| `"10.0.30.10  dc01.lab.local lab.local"` | **The content:** It follows the standard format for a host file entry: [IP Address] [Canonical Hostname] [Aliases] |
+| `sudo tee -a /etc/hosts` | The name of the specific service/container defined in your `docker-compose.yml`. |
+
 </details>
 
 

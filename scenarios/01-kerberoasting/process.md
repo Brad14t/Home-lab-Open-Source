@@ -48,6 +48,19 @@ tool can reach the domain controller by name:
 echo "10.0.30.10  dc01.lab.local lab.local" | sudo tee -a /etc/hosts
 ```
 
+<details>
+<summary>Click here to expand the dropdown</summary>
+
+### This is hidden content!
+You can put text, lists, images, or even code blocks inside this section.
+
+```bash
+echo "Hello World"
+```
+</details>
+
+
+
 Then I requested the service ticket, authenticating as a normal, non-admin domain
 user — that's all Kerberoasting needs:
 

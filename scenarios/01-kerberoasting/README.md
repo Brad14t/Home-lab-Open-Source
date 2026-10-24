@@ -200,7 +200,7 @@ Added to Wazuh's `local_rules.xml`:
 <group name="windows,kerberoasting,">
 
   <rule id="100130" level="12">
-    <decoded_as>windows_eventchannel</decoded_as>
+    <if_sid>60106</if_sid>
     <field name="win.system.eventID">^4769$</field>
     <field name="win.eventdata.ticketEncryptionType">^0x17$</field>
     <description>Possible Kerberoasting (RC4 ticket): $(win.eventdata.serviceName) requested by $(win.eventdata.targetUserName) from $(win.eventdata.ipAddress)</description>
@@ -208,11 +208,17 @@ Added to Wazuh's `local_rules.xml`:
   </rule>
 
   <rule id="100131" level="10">
-    <decoded_as>windows_eventchannel</decoded_as>
+    <if_sid>60106</if_sid>
     <field name="win.system.eventID">^4769$</field>
-    <field name="win.eventdata.serviceName">^svc-sql$|^svc-backup$</field>
+    <field name="win.eventdata.serviceName" type="pcre2">^(svc-sql|svc-backup)$</field>
     <description>Possible Kerberoasting (monitored service account): $(win.eventdata.serviceName) ticket requested by $(win.eventdata.targetUserName) from $(win.eventdata.ipAddress)</description>
     <mitre><id>T1558.003</id></mitre>
+  </rule>
+
+  <rule id="100139" level="5">
+    <if_sid>60106</if_sid>
+    <field name="win.system.eventID">^4769$</field>
+    <description>TEST - any Kerberos 4769 ticket request</description>
   </rule>
 
 </group>

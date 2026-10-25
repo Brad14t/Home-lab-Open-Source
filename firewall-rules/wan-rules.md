@@ -8,8 +8,7 @@ management path needs an explicit pass rule.
 | Pass | TCP | 192.168.0.234 | This Firewall | 443 | pfSense web UI |
 | Pass | TCP | 192.168.0.0/24 | 10.0.20.0/24 | 443 | Wazuh dashboard |
 | Pass | TCP | 192.168.0.0/24 | 10.0.20.0/24 | 8000 | Splunk |
-| Pass | TCP | 192.168.0.0/24 | 10.0.20.0/24 | 9000 | TheHive |
-| Pass | TCP | 192.168.0.0/24 | 10.0.20.0/24 | 9001 | Cortex |
+| Pass | TCP | 192.168.0.0/24 | 10.0.20.0/24 | 443 | DFIR-IRIS (case management) |
 | Pass | TCP | 192.168.0.0/24 | 10.0.20.0/24 | 22 | SSH to SECURITY VLAN |
 | Pass | TCP | 192.168.0.234 | 10.0.30.10 | 22 | SSH to DC01 |
 | Pass | TCP | 192.168.0.234 | VULN_DOCKER | VULN_MGMT_PORTS | SSH, Portainer, DVWA, bWAPP |

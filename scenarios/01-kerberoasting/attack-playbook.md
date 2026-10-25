@@ -92,7 +92,8 @@ is the critical moment — the Domain Controller just handed us a ticket encrypt
 with the `svc-sql` account's password hash, to a completely unprivileged user,
 with no alerts, no failed logins, and no special permissions required.
 
-![klist get succeeds](evidence/02-klist-get-success.png)
+<img width="562" height="141" alt="image" src="https://github.com/user-attachments/assets/e9c3a2f0-c346-45cc-b785-d0e12aa8005e" />
+
 
 **A note on what happens next in a real attack:** this ticket is encrypted with
 AES, not RC4. AES-encrypted Kerberos tickets are computationally far more
@@ -102,3 +103,48 @@ complexity. This lab environment's RC4 hardening means the classic "roast it in
 an afternoon" version of this attack doesn't work here — but the exposure itself
 (an unprivileged user obtaining any service account's ticket on demand) is
 identical
+
+## Phase 3 — Confirm possession of the ticket
+
+A quick final check to prove the ticket is sitting in our cache, ready to be
+used (or, in a less-hardened environment, extracted and cracked).
+
+```powershell
+klist
+```
+
+<details>
+<summary>Command explained</summary>
+
+| Part | What it does |
+|---|---|
+| `klist` | Lists every Kerberos ticket currently cached for this logon session — no arguments means "show, don't request" |
+
+</details>
+
+**Outcome:** The `svc-sql` ticket for `MSSQLSvc/sql01.lab.local:1433` appears in
+the list, confirming we successfully hold a valid service ticket for an account
+we have no legitimate reason to be touching.
+
+![klist showing cached svc-sql ticket](evidence/03-klist-confirm.png)
+
+---
+
+## Summary — what was actually achieved
+
+As a standard, unprivileged domain user (`jcarter`), with no admin rights and no
+attacker tooling beyond what Windows ships with:
+
+1. Enumerated every Service Principal Name in the domain (`setspn`)
+2. Identified `svc-sql` as a service account with an SPN
+3. Requested and received a valid Kerberos service ticket for that account
+   (`klist get`)
+4. Confirmed the ticket is cached and usable
+
+This is the complete Kerberoasting technique (MITRE ATT&CK T1558.003). In this
+lab, the ticket's AES encryption makes it impractical to crack offline with
+consumer hardware — but the underlying exposure (any domain user can request a
+ticket for any service account, at will, with no alerting by default) is present
+regardless of encryption type. The next document — 
+[`blue-team-analysis.md`](./blue-team-analysis.md) — picks this up from the
+defender's side, with none of the above assumed as known.

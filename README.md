@@ -25,7 +25,7 @@ flowchart TB
     subgraph SEC["SECURITY VLAN · 10.0.20.0/24"]
         WAZUH["Wazuh SIEM<br/>.10"]
         SPLUNK["Splunk<br/>.11"]
-        HIVE["TheHive + Cortex<br/>.12 / .13"]
+        DFIR-IRIS["DFIR-IRIS<br/>.12 / .13"]
     end
 
     subgraph CORP["CORPORATE VLAN · 10.0.30.0/24"]
@@ -68,7 +68,7 @@ flowchart TB
     class FW fw
 ```
 
-The lab is segmented into five VLANs behind a pfSense firewall, each with its own ruleset enforcing least-privilege access. An attack launched from the ATTACKER VLAN is blocked at the perimeter, fires a detection in the SECURITY (SOC) zone, and is escalated to a case in TheHive — the full detect-and-respond pipeline.
+The lab is segmented into five VLANs behind a pfSense firewall, each with its own ruleset enforcing least-privilege access. An attack launched from the ATTACKER VLAN is blocked at the perimeter, fires a detection in the SECURITY (SOC) zone, and is escalated to a case in DFIR-IRIS — the full detect-and-respond pipeline.
  
 ---
 
@@ -89,7 +89,7 @@ The lab is segmented into five VLANs behind a pfSense firewall, each with its ow
 | Hypervisor | Proxmox VE |
 | Firewall / IDS | pfSense, Suricata |
 | SIEM | Wazuh, Splunk |
-| Case management | TheHive, Cortex |
+| Case management | DFIR-IRIS |
 | Endpoint telemetry | Sysmon (sysmon-modular), Wazuh agents |
 | Directory services | Windows Server 2025 Active Directory |
 | Attack infrastructure | Kali Linux, MITRE Caldera, Nessus Essentials |
@@ -118,7 +118,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 | Phase | Focus | Status |
 |---|---|---|
 | 1 | Network infrastructure (pfSense, VLANs, segmentation) | ✅ Complete |
-| 2 | Security monitoring (Wazuh, Splunk, TheHive, Cortex) | ✅ Complete |
+| 2 | Security monitoring (Wazuh, Splunk, DFIR-IRIS) | ✅ Complete |
 | 3 | Active Directory (DCs, GPOs, Sysmon, agents) | ✅ Complete |
 | 4 | Vulnerable systems (DVWA, bWAPP, Metasploitable, Suricata) | ✅ Complete |
 | 5 | Attack infrastructure (Kali, Caldera, Nessus) | ✅ Complete |

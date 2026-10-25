@@ -1,45 +1,70 @@
-# Blue Team Analysis — Alert Investigation
+# Blue Team Analysis — Threat Hunt & Detection Gap Investigation
 
 > **Perspective:** This document is written from the **defender's** point of view.
-> The analyst working this case has **no prior knowledge** of the attack described
-> in [`attack-playbook.md`](./attack-playbook.md) — everything below is reasoned
-> from what the monitoring tools actually show, the way a real SOC investigation
-> would unfold.
+> The analyst working this has **no prior knowledge** of the attack described in
+> [`attack-playbook.md`](./attack-playbook.md). Unlike a typical alert-driven
+> investigation, this one starts from a **proactive hunt** — because, as the
+> investigation itself will show, the automated detection didn't fire the way it
+> should have.
 
-## Step 1 — The alert
+## Step 1 — Why hunt instead of wait for an alert?
 
-While reviewing the Wazuh dashboard, an alert appears:
+Kerberoasting is a technique that, by design, leaves almost no trace in the
+places defenders usually look first. There's no failed login, no account
+lockout, no obviously malicious process — just a Kerberos ticket request that
+looks, on the surface, like completely normal domain activity. A detection rule
+can be written for it, but relying on that rule alone is risky: if it's wrong,
+misconfigured, or has a blind spot, the attack can walk right past it with
+nothing to show for it afterward.
 
-> **Possible Kerberoasting (monitored service account): svc-sql ticket requested
-> by jcarter@LAB.LOCAL from ::ffff:10.0.30.102**
-> Rule 100131 · Level 10
+For that reason, mature SOCs periodically **hunt** for Kerberoasting indicators
+directly, rather than waiting for an alert — treating any configured detection
+rule as a safety net, not the only line of defense. This hunt starts with one
+simple question: *which service accounts in this domain have had Kerberos
+service tickets requested for them recently, and by whom?*
 
-Level 10 is high enough to warrant immediate attention — this isn't routine noise.
-Before assuming anything, the first job is to understand exactly what this alert
-is telling us and whether it's actually suspicious.
+## Step 2 — Pulling the data
 
-![Wazuh alert detail](evidence/04-wazuh-alert-fired.png)
+In the Wazuh dashboard, under **Discover**, the analyst searches raw Windows
+Security events (not just alerts) for Kerberos service ticket requests:
 
----
+```
+data.win.system.eventID:4769
+```
 
-## Step 2 — Understand the raw event
+<details>
+<summary>What this search does</summary>
 
-Clicking into the alert's full event data in Wazuh shows the underlying Windows
-Event 4769 (Kerberos Service Ticket Request) that triggered it:
+| Part | What it does |
+|---|---|
+| `data.win.system.eventID:4769` | Filters to only Windows Event ID 4769 — "A Kerberos service ticket was requested" — across all ingested logs, alerted or not |
 
-| Field | Value | What it means |
-|---|---|---|
-| `eventID` | 4769 | A Kerberos **service ticket** was requested — not a login, a ticket for a *service* |
-| `targetUserName` | jcarter@LAB.LOCAL | The account that **requested** the ticket |
-| `serviceName` | svc-sql | The account the ticket was **issued for** — i.e., whose password-derived key encrypts it |
-| `ticketEncryptionType` | 0x12 | AES256 — a modern, hard-to-crack encryption type (0x17 would mean the weaker RC4) |
-| `ipAddress` | ::ffff:10.0.30.102 | Where the request came from |
+</details>
 
-**First read:** `jcarter` is a standard user. `svc-sql` sounds like a service
-account — those normally only get ticket requests from the *servers* that run the
-service, not from a random user's workstation. That mismatch is the core of why
-this is suspicious: **why would a regular user's machine be requesting a ticket
-for a SQL service account at all?**
+This surfaces a high volume of routine results: machine accounts (`DC01$`)
+requesting their own tickets, and `krbtgt` renewal traffic. That's expected,
+constant background noise on any domain. To cut through it, the analyst adds a
+second filter targeting only **user-initiated** requests to accounts that *look
+like* service accounts:
 
-This single event, on its own, proves someone *asked* for the ticket. It doesn't
-yet prove intent — plenty of
+```
+data.win.system.eventID:4769 and data.win.eventdata.serviceName:svc-*
+```
+
+This narrows the view to requests for any service account following the lab's
+`svc-` naming convention — and one result stands out:
+
+| Field | Value |
+|---|---|
+| `targetUserName` | jcarter@LAB.LOCAL |
+| `serviceName` | svc-sql |
+| `ticketEncryptionType` | 0x12 (AES256) |
+| `ipAddress` | ::ffff:10.0.30.102 |
+
+![Wazuh Discover search results for 4769 events against service accounts](evidence/04-wazuh-hunt-results.png)
+
+**Why this stands out:** `jcarter` is a standard end-user account. `svc-sql`
+is a service account that should only ever be used by whatever system actually
+runs the SQL service — never requested directly by a person's own logon. A
+user's workstation asking for a ticket to a service account it has no business
+touching is exactly the kind of anomaly Kerberoasting produces.

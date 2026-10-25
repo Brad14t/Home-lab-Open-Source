@@ -56,7 +56,7 @@ How the defense caught it.
 
 - **Expected telemetry:** [e.g. Windows Security 4769, encryption type 0x17 (RC4)]
 - **Detection rule:** [rule ID, level, link to the rule file in `/detections`]
-- **Where it surfaced:** [Wazuh dashboard / Suricata alerts / TheHive case]
+- **Where it surfaced:** [Wazuh dashboard / Suricata alerts / DFIR-IRIS]
 
 ### Evidence
 

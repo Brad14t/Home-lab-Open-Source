@@ -126,7 +126,7 @@ klist
 the list, confirming we successfully hold a valid service ticket for an account
 we have no legitimate reason to be touching.
 
-![klist showing cached svc-sql ticket](evidence/03-klist-confirm.png)
+<img width="601" height="393" alt="image" src="https://github.com/user-attachments/assets/a3300704-b779-4060-87ac-9cc8b7b80296" />
 
 ---
 

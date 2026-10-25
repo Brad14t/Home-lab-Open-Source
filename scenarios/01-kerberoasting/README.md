@@ -14,7 +14,6 @@
 | **Attacker (successful)** | `WS01` · 10.0.30.102, as compromised user `jcarter` |
 | **Detection source** | Wazuh custom rules `100130`/`100131` on Windows Event 4769 |
 | **Status** | ✅ Detected (AES variant, encryption-agnostic rule) |
-| **Time to detect** | `<attack time>` → `<alert time>` (near real-time) |
 
 ---
 

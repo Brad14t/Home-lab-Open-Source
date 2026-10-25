@@ -233,7 +233,7 @@ naming `svc-sql`, `jcarter`, and the source workstation.
 
 <img width="171" height="45" alt="image" src="https://github.com/user-attachments/assets/61e59e68-6c7b-4f45-a710-d6351aaf8ff3" />
 
-<img width="767" height="244" alt="image" src="https://github.com/user-attachments/assets/ae890777-6980-4887-a9f7-0fd860197560" />
+<img width="767" height="249" alt="image" src="https://github.com/user-attachments/assets/966a705e-67ab-4be0-9e85-2c0ea98bab3e" />
 
 ---
 

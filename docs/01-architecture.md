@@ -19,7 +19,7 @@ flowchart TB
     subgraph SEC["SECURITY VLAN · 10.0.20.0/24"]
         WAZUH["Wazuh SIEM<br/>.10"]
         SPLUNK["Splunk<br/>.11"]
-        HIVE["TheHive + Cortex<br/>.12 / .13"]
+        DFIR-IRIS["DFIR-IRIS<br/>.12 / .13"]
     end
 
     subgraph CORP["CORPORATE VLAN · 10.0.30.0/24"]
@@ -81,7 +81,7 @@ Five VLANs behind a pfSense firewall. Each VLAN has its own ruleset; the default
 
 | VLAN | Subnet | Purpose | Posture |
 |---|---|---|---|
-| SECURITY | 10.0.20.0/24 | SOC tooling (Wazuh, Splunk, TheHive, Cortex) | Default pass (trusted) |
+| SECURITY | 10.0.20.0/24 | SOC tooling (Wazuh, Splunk, DFIR-IRIS) | Default pass (trusted) |
 | CORPORATE | 10.0.30.0/24 | Active Directory, workstations | DNS/agents/internet only |
 | VULNERABLE | 10.0.40.0/24 | DVWA, bWAPP, Metasploitable | Default-deny, no internet |
 | ATTACKER | 10.0.50.0/24 | Kali, Nessus | VULNERABLE + internet only |
@@ -108,7 +108,7 @@ Full rulesets: [../firewall-rules/](../firewall-rules/)
 | Network IDS | Suricata (ET Open ruleset) |
 | SIEM | Wazuh (manager + indexer + dashboard) |
 | Log platform | Splunk |
-| Case management | TheHive + Cortex |
+| Case management | DFIR-IRIS |
 | Endpoint telemetry | Sysmon (sysmon-modular), Wazuh agents |
 | Directory services | Windows Server 2025 AD |
 | Attack platform | Kali Linux, MITRE Caldera |

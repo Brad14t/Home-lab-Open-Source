@@ -139,3 +139,108 @@ hunting one.** A rule that works in testing but not in production is arguably
 worse than no rule at all — it creates false confidence that Kerberoasting
 activity will be caught automatically, when in practice it won't be. The next
 step was figuring out exactly why.
+
+## Step 4 — Detection engineering investigation
+
+A rule that fires in testing but not for the real attack traffic means the
+rule itself isn't necessarily broken — something about the *production*
+conditions is different from the *test* conditions. I needed to find that
+difference.
+
+### 4a — Re-confirming the rule logic is sound
+
+First, I re-validated the rule syntax directly on the manager to rule out a
+config error:
+
+```
+sudo /var/ossec/bin/wazuh-analysisd -t
+```
+
+<details>
+<summary>Command explained</summary>
+
+| Part | What it does |
+|---|---|
+| `sudo` | Required — only root can read Wazuh's config/rule files |
+| `/var/ossec/bin/wazuh-analysisd` | The Wazuh analysis engine binary — the component that evaluates rules against incoming events |
+| `-t` | "Test configuration" mode — validates all rules and decoders without starting the service, and reports syntax errors or load failures |
+
+</details>
+
+This came back clean — no errors, correct rule count loaded. The rule file
+itself was not the problem.
+
+### 4b — Isolating the discrepancy to the source IP format
+
+I compared the one working test alert against the real attack event,
+field-by-field, using the raw indexed archive data rather than relying on the
+dashboard:
+
+```
+sudo grep '"eventID":"4769"' /var/ossec/logs/archives/archives.json | jq -c 'select(.data.win.eventdata.targetUserName=="jcarter@LAB.LOCAL")'
+```
+
+<details>
+<summary>Command explained</summary>
+
+| Part | What it does |
+|---|---|
+| `sudo grep '"eventID":"4769"' /var/ossec/logs/archives/archives.json` | Searches Wazuh's full event archive (every event ingested, not just alerts) for Kerberos ticket requests |
+| `jq -c 'select(.data.win.eventdata.targetUserName=="jcarter@LAB.LOCAL")'` | Parses each matching line as JSON and filters down to only the event where the requesting account is `jcarter` — compact one-line-per-record output |
+
+</details>
+
+This confirmed the real event *was* ingested and correctly decoded by Wazuh —
+every field was present and well-formed. The only meaningful difference
+between this event and the one that triggered rule `100131` during testing was
+the `ipAddress` field:
+
+| | Test event (fired) | Real attack event (did not fire) |
+|---|---|---|
+| `ipAddress` | `::1` | `::ffff:10.0.30.102` |
+
+`::1` is plain IPv6 loopback. `::ffff:10.0.30.102` is an **IPv4-mapped IPv6
+address** — the standard notation a dual-stack system uses to represent an
+IPv4 address inside an IPv6 field. Same rule, same decoder, same event
+structure — just a different IP address *format*.
+
+### 4c — Ruling out the obvious alternatives
+
+Before concluding it was the IP format, I ruled out the more common causes of
+"rule works in testing but not in production":
+
+- **EPS throttling** — raised the agent's `max_eps` from 50 to 500 on DC01 and
+  re-tested. No change.
+- **Event backlog / delayed forwarding** — checked `ossec.log` timestamps
+  against the agent's connection state; the event arrived and was processed
+  in real time, not queued.
+- **Manager crash or restart mid-event** — checked `ossec.log` for
+  SIGNAL/restart entries around the event's timestamp; none occurred. The
+  same `wazuh-analysisd` process that fired the test alert was still running
+  when the real event came through.
+- **Rule not actually loaded** — confirmed via the "Total rules enabled"
+  count in `ossec.log`, which incremented correctly after every edit.
+
+None of these explained it. The IP address format was the one consistent
+variable.
+
+### 4d — Likely root cause
+
+Further research into how Wazuh internally parses IP address fields pointed to
+a known class of issue: Wazuh's internal field-extraction logic for IP
+addresses can rely on a character-class pattern that doesn't account for the
+embedded `.` characters inside an IPv4-mapped IPv6 address like
+`::ffff:10.0.30.102`. If that internal extraction step silently stops or
+mismatches partway through the value, it can affect downstream rule
+processing for that event — without logging any visible error.
+
+This matches the external reporting on Wazuh's handling of IPv6 traffic
+generally: see [Wazuh IPv6 Security Monitoring — oneuptime.com](https://oneuptime.com/blog/post/2026-03-20-wazuh-ipv6-security-monitoring/view).
+
+**Bottom line:** the detection rule is logically correct and does fire for a
+`svc-sql` Kerberos ticket request — confirmed in Step 3b. But in this
+environment, Windows Server 2025 reports the client address of *any* remote
+(non-loopback) caller in IPv4-mapped IPv6 notation, and that notation appears
+to interfere with Wazuh's event matching for this rule in a way that doesn't
+affect loopback-sourced test traffic. This is a genuine detection gap, not a
+one-off fluke.

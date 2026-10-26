@@ -61,7 +61,8 @@ This narrows the view to requests for any service account following the lab's
 | `ticketEncryptionType` | 0x12 (AES256) |
 | `ipAddress` | ::ffff:10.0.30.102 |
 
-![Wazuh Discover search results for 4769 events against service accounts](evidence/04-wazuh-hunt-results.png)
+<img width="767" height="447" alt="image" src="https://github.com/user-attachments/assets/33c32dbf-630c-4bd1-a74c-a8093fd77b43" />
+
 
 **Why this stands out:** `jcarter` is a standard end-user account. `svc-sql`
 is a service account that should only ever be used by whatever system actually

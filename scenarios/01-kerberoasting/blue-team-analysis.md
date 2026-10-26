@@ -99,6 +99,24 @@ data.win.system.eventID:4769 and rule.id:(100130 or 100131)
 
 **Result: zero matches for the `jcarter → svc-sql` event.**
 
+<img width="761" height="340" alt="image" src="https://github.com/user-attachments/assets/7491019d-3fef-4785-b4db-9a65ed1ac1a9" />
+
+## Step 3b — Confirming this alert isn't the one I was looking for
+
+The one record that came back for `rule.id:100131` fired, but pulling apart
+its fields showed me three things that ruled it out as evidence of the real
+attack:
+
+| # | Field | What it showed | Why it rules this alert out |
+|---|---|---|---|
+| 1 | `targetUserName` | `adm-brad@LAB.LOCAL` | This is a different account entirely from the one I found during the hunt (`jcarter@LAB.LOCAL`). `adm-brad` is an admin account I used earlier to validate the rule logic, not the account that touched `svc-sql` in the real attack. |
+| 2 | `ipAddress` | `::1` | This is the IPv6 loopback address — the request originated from the Wazuh/DC itself, not from a workstation on the network. The real attack traffic came from `::ffff:10.0.30.102` (WS01, on the CORPORATE VLAN). A loopback-sourced request can't be the remote attack I'm hunting. |
+| 3 | `systemTime` | `2026-10-25T20:57:57Z` | This timestamp lines up with when I was testing the detection rule, not with the actual `jcarter` → `svc-sql` request I found in the Discover hunt. |
+
+**Conclusion:** this alert is a leftover from rule testing — proof the rule
+*can* fire, but not evidence it fired for the real attack. The `jcarter`
+event I found in Step 2 still has no corresponding alert anywhere in Wazuh.
+
 This is the gap. I had a detection rule written for exactly this pattern — a
 monitored service account (`svc-sql`) being requested outside of normal
 machine-account activity — and it simply didn't fire for the real attack

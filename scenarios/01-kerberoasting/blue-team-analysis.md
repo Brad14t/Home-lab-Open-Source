@@ -244,5 +244,4 @@ generally: see [Wazuh IPv6 Security Monitoring — oneuptime.com](https://oneupt
 environment, Windows Server 2025 reports the client address of *any* remote
 (non-loopback) caller in IPv4-mapped IPv6 notation, and that notation appears
 to interfere with Wazuh's event matching for this rule in a way that doesn't
-affect loopback-sourced test traffic. This is a genuine detection gap, not a
-one-off fluke.
+affect loopback-sourced test traffic. 

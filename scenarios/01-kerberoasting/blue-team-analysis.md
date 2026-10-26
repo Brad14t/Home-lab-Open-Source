@@ -245,3 +245,59 @@ environment, Windows Server 2025 reports the client address of *any* remote
 (non-loopback) caller in IPv4-mapped IPv6 notation, and that notation appears
 to interfere with Wazuh's event matching for this rule in a way that doesn't
 affect loopback-sourced test traffic. 
+
+## Step 5 — Finding & remediation
+
+### Finding
+
+The Kerberoasting detection rules (`100130`, `100131`) are logically sound
+and confirmed to fire correctly against a controlled test event. However,
+they do **not** reliably fire against real-world attack traffic sourced from
+a remote host on this network, due to a likely parsing issue in how Wazuh
+handles IPv4-mapped IPv6 address notation (`::ffff:x.x.x.x`) — the format
+Windows Server 2025 uses for any non-loopback client address.
+
+This means Kerberoasting activity against `svc-sql` or `svc-backup` from any
+workstation on the CORPORATE VLAN would currently go **undetected** by the
+automated rule, even though the rule exists and is enabled. The only reason
+this activity was caught at all was the proactive hunt in Steps 1–2 — not the
+detection pipeline.
+
+**This is being tracked as a confirmed detection gap**, not a false negative
+explained away. It's logged here exactly as found, rather than quietly
+patched out of the narrative, because an honest gap found through hunting is
+a more realistic (and more valuable) SOC finding than a clean alert would
+have been.
+
+### Compensating control
+
+Until the underlying Wazuh IP-handling issue is resolved (or the rule is
+reworked to match on a field less affected by the IPv6 notation, such as a
+raw string match against `ipAddress` rather than relying on default IP-field
+parsing), the compensating control is the same proactive hunt demonstrated in
+Steps 1–3:
+
+- Periodically query `data.win.system.eventID:4769` filtered to `svc-*`
+  service accounts, independent of whether an alert fired.
+- Treat any user-initiated request to a service account as suspicious by
+  default, since legitimate service ticket requests should only ever
+  originate from the systems actually running those services.
+
+### Hardening recommendations
+
+Separate from the detection gap, the underlying exposure — Kerberoasting
+being possible against `svc-sql` and `svc-backup` at all — has standard,
+well-established mitigations:
+
+- **Use Group Managed Service Accounts (gMSAs)** for service accounts instead
+  of standard user accounts. gMSAs use long, automatically-rotated passwords
+  that make offline cracking of a captured ticket effectively infeasible.
+- **Keep RC4 disabled domain-wide** (already enforced in this lab via Windows
+  Server 2025 defaults) — this alone forces attackers toward slower,
+  harder-to-crack AES tickets, as seen in this scenario.
+- **Enforce long, random passwords on any service account that can't use a
+  gMSA** — length matters more than complexity against offline Kerberoasting
+  cracking attempts.
+- **Apply least privilege to service accounts** — `svc-sql` should only have
+  the permissions its service actually requires, limiting the blast radius
+  if its ticket is ever successfully cracked.

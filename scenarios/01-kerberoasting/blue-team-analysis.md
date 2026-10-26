@@ -170,6 +170,8 @@ sudo /var/ossec/bin/wazuh-analysisd -t
 This came back clean — no errors, correct rule count loaded. The rule file
 itself was not the problem.
 
+<img width="273" height="22" alt="image" src="https://github.com/user-attachments/assets/e6c4eca7-514f-412d-8cb2-44440c77260c" />
+
 ### 4b — Isolating the discrepancy to the source IP format
 
 I compared the one working test alert against the real attack event,

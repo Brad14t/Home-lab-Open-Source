@@ -3,8 +3,7 @@
 # Wazuh Dashboard — Kerberoasting Detection
 
 A two-panel Wazuh dashboard built on the custom Kerberoasting rules (`100130`,
-`100131`) from [Scenario 01 — Kerberoasting](./README.md). Built to give a
-quick, at-a-glance view of Kerberoasting-related alerts without having to
+`100131`) Built to give a quick, at-a-glance view of Kerberoasting-related alerts without having to
 hand-write a Discover query every time.
 
 ## Panels

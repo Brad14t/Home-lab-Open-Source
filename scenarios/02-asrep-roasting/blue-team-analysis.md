@@ -148,7 +148,7 @@ The alert fired immediately:
 }
 ```
 
-Placeholder `evidence/10-asrep-alert-fired.png`.
+<img width="811" height="273" alt="image" src="https://github.com/user-attachments/assets/b6b53fc3-e9af-4652-92c8-b043a2169a37" />
 
 This confirms three things at once:
 
@@ -167,3 +167,61 @@ This confirms three things at once:
 Unlike the Kerberoasting scenario, this gap didn't need a compensating
 control or a documented limitation — it got a working fix, validated against
 the actual attack it was meant to catch.
+
+## Step 4 — Finding & remediation
+
+### Finding
+
+AS-REP roasting against `svc-backup` had **zero detection coverage** prior to
+this investigation — not a broken rule, but a complete absence of one. Event
+ID 4768 wasn't covered by any built-in Wazuh rule, meaning an attacker could
+have requested and captured an AS-REP hash for this account with no alert of
+any kind, regardless of how the request was made or from where.
+
+Unlike the Kerberoasting finding, this gap was fully closed rather than
+documented as an open limitation. A new rule (`100132`) was written, anchored
+using the sibling-matching lesson from the Kerberoasting investigation, and
+deliberately designed to avoid matching directly on the `ipAddress` field —
+the specific pattern responsible for the earlier rule's failure on remote
+traffic. The rule was then validated against a real, remote AS-REP request
+and fired correctly on the first attempt.
+
+This also retroactively strengthens the Kerberoasting finding: the working
+behavior of this rule under the same IPv4-mapped IPv6 conditions confirms the
+root cause identified there was correct, and shows a concrete way to design
+future rules so they aren't affected by it.
+
+### Remediation
+
+- **Detection gap closed.** Rule `100132` now alerts on any Kerberos TGT
+  request where pre-authentication was not used, tagged under MITRE ATT&CK
+  `T1558.004`.
+- **Credential exposure remediated.** `svc-backup`'s password was rotated
+  immediately after the attack chain was completed, since the cracked
+  password (`Fall2024!!`) was treated as compromised the moment it appeared
+  in attack evidence — the same standard applied to any real incident.
+- **Underlying misconfiguration should still be corrected.** The rule
+  detects exploitation attempts, but it doesn't fix the root cause: 
+  `svc-backup` still has Kerberos preauthentication disabled. Preauth should
+  be re-enabled for this account unless there's a specific, documented reason
+  it can't be (legacy application compatibility is the usual case) — a
+  detection is a safety net, not a substitute for closing the actual
+  exposure.
+
+### Hardening recommendations
+
+- **Re-enable Kerberos preauthentication** on any account where it isn't
+  explicitly required to stay disabled.
+- **Use Group Managed Service Accounts (gMSAs)** wherever possible, same
+  recommendation as the Kerberoasting scenario — gMSAs use long,
+  automatically-rotated passwords that make offline cracking of a captured
+  AS-REP effectively infeasible even if preauth is somehow disabled again in
+  the future.
+- **Enforce strong passwords on any service account that can't use a gMSA.**
+  This scenario's password (`Fall2024!!`) was deliberately chosen to be
+  crackable for demonstration purposes — a genuinely strong, random password
+  would have resisted the hybrid mask attack used here the same way the
+  Kerberoasting ticket resisted a flat dictionary attack.
+- **Monitor for `Pre-Authentication Type: 0`** specifically, rather than
+  relying solely on failed-logon-based detections — AS-REP roasting, like
+  Kerberoasting, generates no failed authentication events at all.

@@ -113,3 +113,57 @@ Discover searches by default.
 
 **Conclusion:** this was a true blind spot, not a broken rule. The next step
 was writing a detection for it from scratch.
+
+## Step 3 — Validating against live attack traffic
+
+Writing a rule that passes syntax validation isn't the same as confirming it
+actually fires for real attack traffic — that was the exact mistake the
+original Kerberoasting rule made. So before considering this done, I
+generated a fresh AS-REP request against `svc-backup` from the attacker
+workstation and checked whether the new rule caught it.
+
+```
+sudo grep '"id":"100132"' /var/ossec/logs/alerts/alerts.json
+```
+
+<details>
+<summary>What this does</summary>
+
+| Part | What it does |
+|---|---|
+| `grep '"id":"100132"'` | Searches the live alerts log for any alert matching the new rule's ID |
+
+</details>
+
+The alert fired immediately:
+
+```json
+{
+  "rule": {
+    "level": 12,
+    "description": "Possible AS-REP Roasting: TGT requested without Kerberos pre-authentication for svc-backup from ::ffff:10.0.50.10",
+    "id": "100132",
+    "mitre": { "id": ["T1558.004"], "tactic": ["Credential Access"], "technique": ["AS-REP Roasting"] }
+  }
+}
+```
+
+Placeholder `evidence/10-asrep-alert-fired.png`.
+
+This confirms three things at once:
+
+1. The rule correctly identifies `svc-backup` as the targeted account.
+2. The alert correctly tags the activity under MITRE ATT&CK `T1558.004`
+   (AS-REP Roasting).
+3. **The alert fired despite the source address being reported in the same
+   IPv4-mapped IPv6 notation (`::ffff:10.0.50.10`) that silently defeated the
+   Kerberoasting rule.** This validates the root cause identified in the
+   Kerberoasting investigation — the problem was never IPv6 traffic itself,
+   it was specifically matching a rule `<field>` condition directly against
+   that notation. Avoiding that pattern here produced a rule that works
+   correctly on the first real attempt, against real remote attacker
+   traffic, with no debugging required.
+
+Unlike the Kerberoasting scenario, this gap didn't need a compensating
+control or a documented limitation — it got a working fix, validated against
+the actual attack it was meant to catch.

@@ -88,4 +88,21 @@ hashcat -m 18200 -a 6 asrep_hashes.txt seasons.txt ?d?d?d?d?s?s
 
 <img width="689" height="244" alt="image" src="https://github.com/user-attachments/assets/dca0c081-4aeb-47b8-897f-b36b5b7b2c10" />
 
+## Summary — what was actually achieved
 
+- Identified `svc-backup` as having Kerberos pre-authentication disabled via
+  authenticated LDAP enumeration (no password guessing, no domain admin
+  rights required — just one already-compromised standard user account).
+- Requested and captured `svc-backup`'s AS-REP hash directly from the domain
+  controller, entirely offline from that point forward — no further
+  authentication attempts, no additional logon events generated.
+- Cracked the hash offline using a hybrid mask attack (season + year + special
+  characters) rather than a flat dictionary, recovering the real password:
+  `Fall20215!`.
+- Demonstrated full compromise of a domain service account with **zero
+  interaction with the account's actual password** until the final offline
+  cracking step — the account's own misconfiguration (preauth disabled) was
+  the entire vulnerability.
+
+This hands off to [`blue-team-analysis.md`](./blue-team-analysis.md) for the
+defender's side of this scenario.

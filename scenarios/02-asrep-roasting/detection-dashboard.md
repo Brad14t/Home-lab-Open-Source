@@ -42,6 +42,6 @@ requested from `::ffff:10.0.50.10` — the real attack traffic from this
 scenario's `attack-playbook.md`, successfully caught by rule `100132` on the
 first live attempt. Unlike the Kerberoasting panels (which only ever show the
 local test-fire alerts due to the documented detection gap in
-[[Scenario 01's blue-team-analysis.md](../01-kerberoasting/blue-team-analysis.md))](https://github.com/Brad14t/Home-lab-Open-Source/blob/main/scenarios/01-kerberoasting/blue-team-analysis.md),
+[[Scenario 01's blue-team-analysis.md](https://github.com/Brad14t/Home-lab-Open-Source/blob/main/scenarios/01-kerberoasting/blue-team-analysis.md),
 this panel reflects a real, correctly-detected attack — a working example of
 the detection pipeline doing exactly what it's supposed to.

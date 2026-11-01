@@ -235,8 +235,7 @@ cat /etc/passwd
 
 </details>
 
-<details>
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$ cat /etc/passwd
 cat /etc/passwd
@@ -332,8 +331,7 @@ ls -la /var/run/docker.sock
 
 </details>
 
-<details>
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 <l/vulnerabilities/exec$ ls -la /var/run/docker.sock
@@ -361,7 +359,7 @@ env
 
 </details>
 
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 ip a

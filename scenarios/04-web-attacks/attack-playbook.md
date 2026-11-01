@@ -420,7 +420,7 @@ getent hosts db
 
 </details>
 
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 cat /etc/hosts
@@ -470,7 +470,7 @@ php -r '$c = new mysqli("172.19.0.2", "dvwa", "p@ssw0rd", "dvwa"); if ($c->conne
 
 </details>
 
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 access_log

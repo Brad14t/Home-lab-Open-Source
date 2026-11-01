@@ -43,7 +43,11 @@ sanitization at all. This is a classic OS Command Injection vulnerability
 (CWE-78) — anything the web server's user account can run, an attacker can
 now run too.
 
-First, start a listener on Kali: `nc -lvnp 4444`
+First, start a listener on Kali: 
+
+```
+nc -lvnp 4444
+```
 
 <details>
 <summary>Payload explained</summary>

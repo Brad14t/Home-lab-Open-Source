@@ -262,3 +262,58 @@ nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
 
 </details>
 
+### Enumeration results
+
+```
+sudo -l
+bash: sudo: command not found
+```
+
+No `sudo` available at all on this host — that avenue is closed.
+
+```
+cat /var/www/html/config/config.inc.php
+```
+
+This exposed DVWA's own database credentials directly in the config file:
+
+| Setting | Value |
+|---|---|
+| `db_server` | `127.0.0.1` |
+| `db_database` | `dvwa` |
+| `db_user` | `dvwa` |
+| `db_password` | `p@ssw0rd` |
+
+Not a privilege escalation path on its own, but a real finding — plaintext
+credentials in an application config file are a classic source of password
+reuse elsewhere on a network.
+
+```
+find / -perm -4000 -type f 2>/dev/null
+/usr/bin/newgrp
+/usr/bin/gpasswd
+/usr/bin/chfn
+/usr/bin/umount
+/usr/bin/su
+/usr/bin/chsh
+/usr/bin/passwd
+/usr/bin/mount
+/usr/lib/openssh/ssh-keysign
+```
+
+All standard system SUID binaries — nothing unusual or independently
+exploitable here.
+
+```
+cat /etc/passwd
+```
+
+Only default system/service accounts present, no additional human user
+accounts to target.
+
+**Conclusion:** no local privilege escalation path exists inside this
+specific container — a reasonably minimal image, consistent with realistic
+hardening. Since this container's network identity sits behind
+`vuln-docker-01`'s own Docker bridge rather than directly on the VULNERABLE
+VLAN, the next step is checking for a container breakout path to the
+underlying host itself.

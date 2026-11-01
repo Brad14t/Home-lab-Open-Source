@@ -45,6 +45,9 @@ now run too.
 
 First, start a listener on Kali: `nc -lvnp 4444`
 
+<details>
+<summary>Payload explained</summary>
+
 | Part | What it does |
 |---|---|
 | `nc` | Netcat — used here to catch an incoming reverse shell connection |
@@ -52,6 +55,8 @@ First, start a listener on Kali: `nc -lvnp 4444`
 | `-v` |Verbose — prints connection status |
 | `-n` |Skips DNS resolution |
 | `-p 4444	` |Listens on port 4444 |
+
+</details>
 
 ## Phase 3 — Enumeration for privilege escalation
 

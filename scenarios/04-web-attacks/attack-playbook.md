@@ -331,3 +331,32 @@ ls -la /var/run/docker.sock
 | `ls -la /var/run/docker.sock` |	Checks whether the Docker daemon’s control socket is mounted inside this container — if present and writable, it means this container can control the Docker host itself, including spinning up a new privileged container to escape into the host OS |
 
 </details>
+
+<details>
+<summary>Click to view full output</summary>
+
+```
+<l/vulnerabilities/exec$ ls -la /var/run/docker.sock
+ls: cannot access '/var/run/docker.sock': No such file or directory
+```
+
+</details>
+
+Checking 2 more things:
+
+```
+ip a
+```
+
+```
+env
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `ip a` |	Shows this container’s network interfaces and assigned IP addresses — reveals whether it’s isolated on a private Docker bridge or has broader network reach |
+| `env` |	Lists all environment variables available to this process — since the DVWA config pulls values via getenv(), the real credentials in use (if different from the file’s defaults) would show up here |
+
+</details>

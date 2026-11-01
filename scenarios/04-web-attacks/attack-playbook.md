@@ -317,3 +317,8 @@ hardening. Since this container's network identity sits behind
 `vuln-docker-01`'s own Docker bridge rather than directly on the VULNERABLE
 VLAN, the next step is checking for a container breakout path to the
 underlying host itself.
+
+The next useful check is whether this container has a path to break out to the host VM itself, which would actually be sitting on the VULNERABLE VLAN. Worth checking if the Docker socket is exposed inside the container — a very common misconfiguration that gives full host-level compromise:
+
+``` ls -la /var/run/docker.sock
+```

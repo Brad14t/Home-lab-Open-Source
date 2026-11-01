@@ -499,7 +499,7 @@ echo '<?php $c = new mysqli("172.19.0.2", "dvwa", "p@ssw0rd", "dvwa"); $r = $c->
 php /tmp/dump.php
 ```
 
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 php /tmp/dump.php
@@ -598,7 +598,7 @@ ps aux
 
 </details>
 
-<summary>Click to view full output</summary>
+<details> <summary>Click to view full output</summary>
 
 ```
 /usr/bin/curl

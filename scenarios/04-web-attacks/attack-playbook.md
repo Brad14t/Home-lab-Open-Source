@@ -34,7 +34,7 @@ second, unrelated command onto the input:
 
 </details>
 
-Placeholder `evidence/02-command-injection-whoami.png`.
+<img width="280" height="159" alt="image" src="https://github.com/user-attachments/assets/58cae92c-e6c6-4d71-9e9e-1f2f457f3752" />
 
 If the page returns both the `ping` output **and** the result of `whoami`,
 this confirms the vulnerability: the application is building a shell command

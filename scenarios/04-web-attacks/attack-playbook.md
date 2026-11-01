@@ -104,6 +104,16 @@ sudo -l
 
 </details>
 
+<details>
+<summary>Click to view full output</summary>
+
+```www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$ sudo -l
+sudo -l
+bash: sudo: command not found
+```
+
+</details>
+
 ```
 cat /var/www/html/config/config.inc.php
 ```

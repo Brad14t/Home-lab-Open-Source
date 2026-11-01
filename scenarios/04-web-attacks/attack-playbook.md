@@ -320,5 +320,14 @@ underlying host itself.
 
 The next useful check is whether this container has a path to break out to the host VM itself, which would actually be sitting on the VULNERABLE VLAN. Worth checking if the Docker socket is exposed inside the container — a very common misconfiguration that gives full host-level compromise:
 
-``` ls -la /var/run/docker.sock
 ```
+ls -la /var/run/docker.sock
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `ls -la /var/run/docker.sock` |	Checks whether the Docker daemon’s control socket is mounted inside this container — if present and writable, it means this container can control the Docker host itself, including spinning up a new privileged container to escape into the host OS |
+
+</details>

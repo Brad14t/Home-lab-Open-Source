@@ -12,7 +12,7 @@ First, a normal, expected input to establish a baseline:
 127.0.0.1
 ```
 
-Placeholder `evidence/01-command-injection-baseline.png`.
+<img width="655" height="496" alt="image" src="https://github.com/user-attachments/assets/e56b2ac2-550f-45ab-b048-893520ff5c7f" />
 
 This returns the expected `ping` output for localhost — confirming the
 backend really does execute a system `ping` command rather than, say, using a

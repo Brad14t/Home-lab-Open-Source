@@ -1,4 +1,4 @@
-# Scenario 03: DCSync
+# Scenario 04: DCSync
 
 > One-line summary: what technique, against what, and what detection proves it.
 

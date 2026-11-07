@@ -1,4 +1,4 @@
-# Scenario 04 — Command Injection / Docker Escape
+# Scenario 03 — Command Injection / Docker Escape
 
 **MITRE ATT&CK:** T1190, T1059.004, T1110, T1611, T1003.008 | **Target:** DVWA on vuln-docker-01 (10.0.40.10)
 

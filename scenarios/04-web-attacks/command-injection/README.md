@@ -1,96 +1,41 @@
-# Scenario 04: Web Attacks (SQLi / XSS / Command Injection)
+# Scenario 04 — Command Injection / Docker Escape
 
-> One-line summary: what technique, against what, and what detection proves it.
+**MITRE ATT&CK:** T1190, T1059.004, T1110, T1611, T1003.008 | **Target:** DVWA on vuln-docker-01 (10.0.40.10)
 
-| | |
-|---|---|
-| **MITRE ATT&CK** | T1190 — Exploit Public-Facing Application |
-| **Tactic** | Initial Access |
-| **Target** | DVWA / bWAPP on vuln-docker-01 |
-| **Attacker** | atk-kali-01 · 10.0.50.10 |
-| **Detection source** | Suricata (VULNERABLE) + Wazuh |
-| **Status** | ⬜ Planned / 🔄 Running / ✅ Detected |
-| **Time to detect** | [attack timestamp → alert timestamp] |
+## Summary
 
----
+An unsanitized input field in DVWA's Command Injection module (CWE-78) was
+used to gain a reverse shell on `vuln-docker-01`. From there, Portainer
+CE's management API was brute-forced and used to create a privileged
+container with the host root filesystem bind-mounted, exposing
+`/etc/shadow`. Detection coverage is partial: two Wazuh rules correctly
+fire on real attack traffic, but a third of the attack chain — including
+the actual exploitation step and a confirmed blind spot in the brute-force
+detection — has no coverage at all.
 
-## Objective
+## Files in this scenario
 
-What this scenario tests and why it matters. One short paragraph. What should the SOC catch, and what would it look like in a real environment?
+| File | Perspective | Contents |
+|---|---|---|
+| `attack-playbook.md` | Attacker | Full command-injection chain: endpoint discovery, reverse shell, enumeration, Portainer brute force, privileged container escape, `/etc/shadow` read |
+| `blue-team-analysis.md` | Defender | Proactive hunt and detection validation, written with no foreknowledge of the attack. Covers what's detected, what isn't, and the discovery of a structural blind spot in the Portainer brute-force rule |
+| `detection-dashboard.md` | Defender | Wazuh dashboard panels built for this scenario's two working detections (`100140`/`100141`, `100150`/`100151`), what each panel shows, and current alert counts |
+| `IRIS-case-command-injection.md` | Both | DFIR-IRIS case record — Summary, Notes, Assets, IOCs, Timeline, Tasks, and Evidence for the full investigation |
+| `incident-report/` | Defender | Screenshots of the DFIR-IRIS case tabs |
 
----
+## Outcome
 
-## Prerequisites & Scope
+**Detected:**
+- DVWA command injection endpoint activity — rule `100151` (T1190), fires on every POST to `/vulnerabilities/exec/`, but cannot distinguish a benign test from a successful exploit since Apache's log format doesn't capture POST bodies
+- Portainer brute force — rule `100141` (T1110), confirmed working **only** when the attacking traffic crosses the pfSense perimeter (external attacker)
 
-The temporary access and setup required, and the boundaries that keep it isolated.
+**Not detected:**
+- Reverse shell establishment (`/dev/tcp`) — no log source captures this at all
+- Post-exploitation enumeration inside the container — no process-level visibility on the host
+- Portainer brute force run from inside the already-compromised container — the **actual attack path used in this scenario**. Confirmed via live re-test: identical traffic pattern, zero alert, zero raw firewall log entry, because it never leaves the Docker host's internal bridge network
+- Privileged container creation and the `/etc/shadow` read — no rule exists; the only corroborating evidence is a Docker daemon lifecycle event recovered through manual `journald` hunting, not an alert
 
-- **Temporary firewall rule:** [source → destination, ports] — enabled for this run, disabled after.
-- **Target state:** [what makes the target attackable, e.g. svc-sql has an SPN and a weak password]
-- **VM set booted:** [e.g. 100, 101, 110, 140]
+**Key finding:** the Portainer brute-force rule was validated and confirmed working during testing, but that testing only covered an external-attacker scenario. The real attack path in this scenario — brute-forcing a service from a foothold already on the same host — is structurally invisible to a detection built entirely on perimeter firewall logs. A host-based mitigation (`auditd`) was attempted to close this gap and found incomplete (unscoped, process-attribution issues); it's documented as open follow-up work rather than a closed gap.
 
-> **Teardown reminder:** disable the temporary rule immediately after the run.
-
----
-
-## Attack
-
-Each command in its own block with a one-line note on what it does. Never paste credentials.
-
-```
-# step 1 — what it does
-command here
-```
-
-```
-# step 2 — what it does
-command here
-```
-
-**Result:** what the attacker obtained (e.g. a Kerberos ticket hash, cracked offline).
-
----
-
-## Detection
-
-How the defense caught it.
-
-- **Expected telemetry:** [e.g. Windows Security 4769, encryption type 0x17 (RC4)]
-- **Detection rule:** [rule ID, level, link to the rule file in `/detections`]
-- **Where it surfaced:** [Wazuh dashboard / Suricata alerts / TheHive case]
-
-### Evidence
-
-Screenshots and, where it adds something a screenshot doesn't, a redacted log excerpt.
-
-<!-- ![Wazuh alert](evidence/01-alert.png) -->
-
-```
-# redacted log excerpt (only if it clarifies the detection)
-```
-
----
-
-## Analysis
-
-What the detection got right, and any gaps.
-
-- Did the attack generate the expected telemetry? Any variants that would have evaded it?
-- Signal quality — did it stand out, or was it buried in noise?
-- Time to detect, and what that depends on.
-
----
-
-## Remediation & Hardening
-
-What would prevent or reduce this in production.
-
-- [e.g. Use gMSAs instead of static service-account passwords]
-- [e.g. Enforce AES, disable RC4]
-- [e.g. Alert on anomalous SPN request volume per account]
-
----
-
-## References
-
-- [MITRE ATT&CK TXXXX.XXX](https://attack.mitre.org/)
-- [Any detection/technique sources used]
+Full investigative detail, real queries, and screenshots are in
+`blue-team-analysis.md` and the DFIR-IRIS case.

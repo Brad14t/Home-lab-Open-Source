@@ -8,6 +8,8 @@ hand-writing a Discover query every time.
 
 ## Panels
 
+<img width="952" height="365" alt="Screenshot 2026-11-07 111941" src="https://github.com/user-attachments/assets/0ea1278e-7c5b-47fb-b1bb-da1d1dfe9b3b" />
+
 ### Portainer Brute Force - Alert Count
 
 A single metric panel showing the total count of alerts matched by rule

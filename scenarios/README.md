@@ -1,7 +1,7 @@
 # Scenarios
 
 Each scenario runs a real attack technique against the lab, then verifies and
-documents the detection. All follow the same structure — see [_TEMPLATE.md](_TEMPLATE.md).
+documents the detection. 
 
 | # | Scenario | MITRE ATT&CK | Status |
 |---|---|---|---|

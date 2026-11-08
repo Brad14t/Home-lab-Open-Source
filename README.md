@@ -105,9 +105,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 |---|---|---|---|---|
 | 01 | Kerberoasting | T1558.003 | Windows 4769 (RC4) + custom Wazuh rule | ⬜ Planned |
 | 02 | AS-REP Roasting | T1558.004 | Windows 4768 (pre-auth 0) | ⬜ Planned |
-| 03 | DCSync | T1003.006 | Windows 4662 (SACL) | ⬜ Planned |
-| 04 | Web attacks (SQLi / XSS / cmd injection) | T1190 | Suricata + Wazuh | ⬜ Planned |
-| 05 | Adversary emulation (Caldera) | Multiple | Sysmon + Wazuh correlation | ⬜ Planned |
+| 03 | Web attacks (SQLi / XSS / cmd injection) | T1190 | Suricata + Wazuh | ⬜ Planned |
  
 <!-- Update Status to ✅ Detected and add a "Time to detect" column as each scenario completes -->
  

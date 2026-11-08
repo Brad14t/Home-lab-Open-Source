@@ -103,10 +103,16 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
  
 | # | Scenario | MITRE ATT&CK | Detection source | Status |
 |---|---|---|---|---|
-| 01 | Kerberoasting | T1558.003 | Windows 4769 (RC4) + custom Wazuh rule | ⬜ Planned |
-| 02 | AS-REP Roasting | T1558.004 | Windows 4768 (pre-auth 0) | ⬜ Planned |
-| 03 | Web attacks (SQLi / XSS / cmd injection) | T1190 | Suricata + Wazuh | ⬜ Planned |
- 
+| 01 | [Kerberoasting](scenarios/01-kerberoasting/) | T1558.003 | Windows 4769 + custom rules 100130/100131 | ⚠️ Gap found and root-caused (`::ffff:` IP); compensating control is hunting |
+| 02 | [AS-REP Roasting](scenarios/02-asrep-roasting/) | T1558.004 | Windows 4768 (pre-auth 0), rule 100132 | ✅ Detected (validated on live traffic) |
+| 03 | [Command injection → container escape](scenarios/03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | Apache log (100150/100151) + pfSense filterlog (100140/100141) | ⚠️ Partially detected; internal brute force is a blind spot |
+
+**Continuous monitoring** (not tied to a single scenario):
+
+| Area | MITRE ATT&CK | Detection source | Status |
+|---|---|---|---|
+| [Authentication monitoring](detections/wazuh-dashboards/authentication-overview.md): logons, failures, brute force, service-account and ATTACKER-VLAN logons, sudo | T1078.002, T1078.003, T1110, T1110.001, T1548.003 | Windows 4624/4625 + Linux journald (sshd, PAM, sudo), rules 100160–100169 | ✅ Detected (100168 pending Scenario 04) |
+
 <!-- Update Status to ✅ Detected and add a "Time to detect" column as each scenario completes -->
  
 ---
@@ -135,7 +141,7 @@ Condensed build details: [docs/02-build-log.md](docs/02-build-log.md)
 | [docs/02-build-log.md](docs/02-build-log.md) | Condensed Phase 1-5 build summary |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Problems hit during the build, root causes, and fixes |
 | [scenarios/](scenarios/) | Per-attack write-ups: attack steps, detection, evidence, remediation |
-| [detections/](detections/) | Custom Wazuh rules and decoders, Sigma rules |
+| [detections/](detections/) | Custom Wazuh rules and decoders, SOC dashboards |
 | [firewall-rules/](firewall-rules/) | pfSense rulesets as copy-paste reference tables |
  
 ---

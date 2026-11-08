@@ -4,6 +4,7 @@ Custom detection content built for this lab. Every rule here was validated again
 
 | Folder | Contents |
 |---|---|
+| [wazuh-dashboards/](wazuh-dashboards/) | Cross-scenario SOC dashboards: [SOC — Authentication Overview](wazuh-dashboards/authentication-overview.md) (panels, queries, scripted fields) |
 | [wazuh-local-rules/](wazuh-local-rules/) | All custom Wazuh rules (`100100`–`100169`) and decoders: ID, level, MITRE mapping, log source, parent rules, validation status and known limitations |
 
 ## Rule ID blocks
@@ -23,7 +24,11 @@ Rules are allocated in blocks of 10 per detection area, so related rules stay to
 
 ## Dashboards
 
-Scenario-specific dashboards are documented inside each scenario folder (`detection-dashboard.md`). The cross-scenario **SOC — Authentication Overview** dashboard is built on rules `100160`–`100169`; its documentation will be added under `detections/` together with the planned Sensitive File Access dashboard.
+| Dashboard | Built on | Doc |
+|---|---|---|
+| Scenario detection panels | One block per scenario | `detection-dashboard.md` in each [scenario folder](../scenarios/) |
+| SOC — Authentication Overview | `100160`–`100169` | [wazuh-dashboards/authentication-overview.md](wazuh-dashboards/authentication-overview.md) |
+| SOC — Sensitive File Access | `100170`+ | Planned |
 
 ## Conventions
 

@@ -1,4 +1,4 @@
-# Blue Team Analysis — Command Injection / Docker Escape Investigation
+# Blue Team Analysis — Command Injection → Docker Container Escape
 
 > **Perspective:** This document is written from the **defender's** point of view.
 > I had **no prior knowledge** of the attack described in

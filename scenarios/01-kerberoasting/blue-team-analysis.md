@@ -1,4 +1,4 @@
-# Blue Team Analysis — Threat Hunt & Detection Gap Investigation
+# Blue Team Analysis — Kerberoasting (T1558.003)
 
 > **Perspective:** This document is written from the **defender's** point of view.
 > I had **no prior knowledge** of the attack described in

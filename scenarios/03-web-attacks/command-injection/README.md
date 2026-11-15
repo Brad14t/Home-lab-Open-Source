@@ -1,6 +1,8 @@
-# Scenario 03 — Command Injection / Docker Escape
+# Scenario 03 — Command Injection → Docker Container Escape
 
-**MITRE ATT&CK:** T1190, T1059.004, T1110, T1611, T1003.008 | **Target:** DVWA on vuln-docker-01 (10.0.40.10)
+**MITRE ATT&CK:** T1190 (Exploit Public-Facing Application), T1059.004 (Unix Shell),
+T1110 (Brute Force), T1611 (Escape to Host), T1003.008 (/etc/passwd and /etc/shadow)  
+**Target:** DVWA on `vuln-docker-01` (10.0.40.10)
 
 ## Summary
 
@@ -17,10 +19,10 @@ detection — has no coverage at all.
 
 | File | Perspective | Contents |
 |---|---|---|
-| `attack-playbook.md` | Attacker | Full command-injection chain: endpoint discovery, reverse shell, enumeration, Portainer brute force, privileged container escape, `/etc/shadow` read |
-| `blue-team-analysis.md` | Defender | Proactive hunt and detection validation, written with no foreknowledge of the attack. Covers what's detected, what isn't, and the discovery of a structural blind spot in the Portainer brute-force rule |
-| `detection-dashboard.md` | Defender | Wazuh dashboard panels built for this scenario's two working detections (`100140`/`100141`, `100150`/`100151`), what each panel shows, and current alert counts |
-| [`IRIS-case-command-injection.md`](./IRIS-case-command-injection.md) | Both | Screenshots of the DFIR-IRIS case record — Summary, Notes, Assets, IOCs, Timeline, Tasks, and Evidence for the full investigation |
+| [`attack-playbook.md`](./attack-playbook.md) | Attacker | Full command-injection chain: endpoint discovery, reverse shell, enumeration, Portainer brute force, privileged container escape, `/etc/shadow` read |
+| [`blue-team-analysis.md`](./blue-team-analysis.md) | Defender | Proactive hunt and detection validation, written with no foreknowledge of the attack. Covers what's detected, what isn't, and the discovery of a structural blind spot in the Portainer brute-force rule |
+| [`detection-dashboard.md`](./detection-dashboard.md) | Defender | Wazuh dashboard panels built for this scenario's two working detections (`100140`/`100141`, `100150`/`100151`), what each panel shows, and current alert counts |
+| [`incident-report.md`](./incident-report.md) | Defender | Screenshots of the full case record built in DFIR-IRIS — Summary, Notes, Assets, IOCs, Timeline, Tasks, and Evidence for the full investigation |
 
 ## Outcome
 
@@ -37,4 +39,5 @@ detection — has no coverage at all.
 **Key finding:** the Portainer brute-force rule was validated and confirmed working during testing, but that testing only covered an external-attacker scenario. The real attack path in this scenario — brute-forcing a service from a foothold already on the same host — is structurally invisible to a detection built entirely on perimeter firewall logs. A host-based mitigation (`auditd`) was attempted to close this gap and found incomplete (unscoped, process-attribution issues); it's documented as open follow-up work rather than a closed gap.
 
 Full investigative detail, real queries, and screenshots are in
-`blue-team-analysis.md` and the DFIR-IRIS case.
+[`blue-team-analysis.md`](./blue-team-analysis.md) and the
+[DFIR-IRIS case](./incident-report.md).

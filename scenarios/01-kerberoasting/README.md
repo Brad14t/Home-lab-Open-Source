@@ -1,6 +1,6 @@
 # Scenario 01 — Kerberoasting
 
-**MITRE ATT&CK:** T1558.003 (Credential Access — Kerberoasting)
+**MITRE ATT&CK:** T1558.003 (Credential Access — Kerberoasting)  
 **Target:** `svc-sql` (Active Directory service account)
 
 ## Summary

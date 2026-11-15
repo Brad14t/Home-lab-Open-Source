@@ -1,6 +1,6 @@
 # Scenario 02 — AS-REP Roasting
 
-**MITRE ATT&CK:** T1558.004 (Credential Access — AS-REP Roasting)
+**MITRE ATT&CK:** T1558.004 (Credential Access — AS-REP Roasting)  
 **Target:** `svc-backup` (Active Directory service account)
 
 ## Summary

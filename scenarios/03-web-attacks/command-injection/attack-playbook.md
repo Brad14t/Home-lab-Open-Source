@@ -1,3 +1,10 @@
+# Attack Playbook — Command Injection → Docker Container Escape (T1190, T1059.004, T1110, T1611, T1003.008)
+
+> **Perspective:** This document is written from the **attacker's** point of view.
+> It describes how the attack is carried out. It contains **no detection or defensive
+> content** — that lives in [`blue-team-analysis.md`](./blue-team-analysis.md), written
+> from the defender's point of view with no prior knowledge of what's here.
+
 ## Phase 1 — Recon: confirming the command injection vulnerability
 
 The DVWA Command Injection module presents a simple form that asks for an IP
@@ -42,6 +49,8 @@ by directly concatenating user input, with no input validation or
 sanitization at all. This is a classic OS Command Injection vulnerability
 (CWE-78) — anything the web server's user account can run, an attacker can
 now run too.
+
+## Phase 2 — Initial access: reverse shell
 
 First, start a listener on Kali: 
 
@@ -1013,7 +1022,7 @@ wazuh:!:20737::::::
 
 The container escape is complete. Starting from a command injection vulnerability in a web application, I achieved read access to the underlying host's credential store without ever touching the Docker socket directly from the compromised container.
 
-## Attack Impact Summary
+## Summary — what was actually achieved
 
 ### What Was Achieved
 

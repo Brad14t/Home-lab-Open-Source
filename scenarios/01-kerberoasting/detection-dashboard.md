@@ -1,12 +1,12 @@
-<img width="955" height="303" alt="image" src="https://github.com/user-attachments/assets/bae779b3-236b-4058-920c-3fc83cdb0d33" />
-
-# Wazuh Dashboard — Kerberoasting Detection
+# Detection Dashboard — Kerberoasting (T1558.003)
 
 A two-panel Wazuh dashboard built on the custom Kerberoasting rules (`100130`,
-`100131`) Built to give a quick, at-a-glance view of Kerberoasting-related alerts without having to
+`100131`), built to give a quick, at-a-glance view of Kerberoasting-related alerts without having to
 hand-write a Discover query every time.
 
 ## Panels
+
+<img width="955" height="303" alt="image" src="https://github.com/user-attachments/assets/bae779b3-236b-4058-920c-3fc83cdb0d33" />
 
 ### Kerberoasting - Alert Count
 A single metric panel showing the total count of alerts matched by rules

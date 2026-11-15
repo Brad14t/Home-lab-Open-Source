@@ -105,7 +105,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 |---|---|---|---|---|
 | 01 | [Kerberoasting](scenarios/01-kerberoasting/) | T1558.003 | Windows 4769 + custom rules 100130/100131 | ⚠️ Gap found and root-caused (`::ffff:` IP); compensating control is hunting |
 | 02 | [AS-REP Roasting](scenarios/02-asrep-roasting/) | T1558.004 | Windows 4768 (pre-auth 0), rule 100132 | ✅ Detected (validated on live traffic) |
-| 03 | [Command injection → container escape](scenarios/03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | Apache log (100150/100151) + pfSense filterlog (100140/100141) | ⚠️ Partially detected; internal brute force is a blind spot |
+| 03 | [Command Injection → Docker Container Escape](scenarios/03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | Apache log (100150/100151) + pfSense filterlog (100140/100141) | ⚠️ Partially detected; internal brute force is a blind spot |
 
 **Continuous monitoring** (not tied to a single scenario):
 

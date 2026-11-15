@@ -129,7 +129,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 | 6 | Detection engineering / purple team | 🔄 In progress |
 | 7 | Documentation & portfolio | 🔄 In progress |
  
-Condensed build details: [docs/02-build-log.md](docs/02-build-log.md)
+Condensed build details: [docs/02-summarized-build-log.md](docs/02-summarized-build-log.md)
  
 ---
 
@@ -138,7 +138,7 @@ Condensed build details: [docs/02-build-log.md](docs/02-build-log.md)
 | Path | Contents |
 |---|---|
 | [docs/01-architecture.md](docs/01-architecture.md) | Network design, VLAN rationale, full tool stack |
-| [docs/02-build-log.md](docs/02-build-log.md) | Condensed Phase 1-5 build summary |
+| [docs/02-summarized-build-log.md](docs/02-summarized-build-log.md) | Condensed Phase 1-5 build summary |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Problems hit during the build, root causes, and fixes |
 | [scenarios/](scenarios/) | Per-attack write-ups: attack steps, detection, evidence, remediation |
 | [detections/](detections/) | Custom Wazuh rules and decoders, SOC dashboards |

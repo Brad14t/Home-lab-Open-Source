@@ -26,7 +26,7 @@ traffic on the first attempt.
 | [`attack-playbook.md`](./attack-playbook.md) | Attacker | Step-by-step reproduction of the attack: recon, AS-REP hash capture, offline cracking — written for someone new to the technique |
 | [`blue-team-analysis.md`](./blue-team-analysis.md) | Defender | Investigation into existing detection coverage, root-cause-driven rule design, and live validation against real attack traffic |
 | [`detection-dashboard.md`](./detection-dashboard.md) | Defender | Documentation of the Wazuh dashboard panels covering this scenario (part of a combined, running dashboard across all scenarios) |
-| [`incident-report/`](./incident-report/) | Defender | Screenshots of the full case record built in DFIR-IRIS — summary, notes, assets, IOCs, timeline, graph, and tasks |
+| [`incident-report.md`](./incident-report.md) | Defender | Screenshots of the full case record built in DFIR-IRIS — summary, notes, assets, IOCs, timeline, graph, and tasks |
 
 ## Outcome
 

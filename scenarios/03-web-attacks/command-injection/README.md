@@ -20,8 +20,7 @@ detection — has no coverage at all.
 | `attack-playbook.md` | Attacker | Full command-injection chain: endpoint discovery, reverse shell, enumeration, Portainer brute force, privileged container escape, `/etc/shadow` read |
 | `blue-team-analysis.md` | Defender | Proactive hunt and detection validation, written with no foreknowledge of the attack. Covers what's detected, what isn't, and the discovery of a structural blind spot in the Portainer brute-force rule |
 | `detection-dashboard.md` | Defender | Wazuh dashboard panels built for this scenario's two working detections (`100140`/`100141`, `100150`/`100151`), what each panel shows, and current alert counts |
-| `IRIS-case-command-injection.md` | Both | DFIR-IRIS case record — Summary, Notes, Assets, IOCs, Timeline, Tasks, and Evidence for the full investigation |
-| `incident-report/` | Defender | Screenshots of the DFIR-IRIS case tabs |
+| [`IRIS-case-command-injection.md`](./IRIS-case-command-injection.md) | Both | Screenshots of the DFIR-IRIS case record — Summary, Notes, Assets, IOCs, Timeline, Tasks, and Evidence for the full investigation |
 
 ## Outcome
 

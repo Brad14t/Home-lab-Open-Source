@@ -11,16 +11,15 @@ documents the detection. All follow the same structure — see [Files in each sc
 
 ## Files in each scenario
 
-Every scenario folder contains the same five artifacts, each written from a
-distinct perspective:
+Every scenario folder contains the same four artifacts (plus a README), each
+written from a distinct perspective:
 
 | File | Perspective | Contents |
 |---|---|---|
 | `attack-playbook.md` | Attacker (red team) | Step-by-step offensive actions, real commands and output, command-explanation tables |
 | `blue-team-analysis.md` | Defender (blue team) | Full investigative narrative, written with no foreknowledge of the attack — hunt methodology, real Discover queries, what fired, what didn't, and why |
 | `detection-dashboard.md` | Defender (blue team) | Wazuh dashboard panels built for the scenario's detections — what each panel shows and what it currently displays, gaps included |
-| `IRIS-case-<scenario-name>.md` | Both | DFIR-IRIS case record — Summary, Notes, Assets, IOCs, Timeline, Tasks, and Evidence |
-| `incident-report/` | Defender (blue team) | Screenshots of the DFIR-IRIS case tabs (Summary, Assets, IOC, Timeline, Tasks, Graph, Evidence) |
+| `incident-report.md` | Defender (blue team) | Screenshots of the DFIR-IRIS case record — Summary, Notes, Assets, IOCs, Timeline, Graph, and Tasks. Named `IRIS-case-command-injection.md` in scenario 03 |
 
 The blue team documents are written as a genuine investigation, not a
 retroactive summary — the analyst has no access to the attack-playbook's

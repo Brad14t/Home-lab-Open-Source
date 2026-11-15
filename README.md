@@ -105,7 +105,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 |---|---|---|---|---|
 | 01 | [Kerberoasting](scenarios/01-kerberoasting/) | T1558.003 | Windows 4769 + custom rules 100130/100131 | ⚠️ Gap found and root-caused (`::ffff:` IP); compensating control is hunting |
 | 02 | [AS-REP Roasting](scenarios/02-asrep-roasting/) | T1558.004 | Windows 4768 (pre-auth 0), rule 100132 | ✅ Detected (validated on live traffic) |
-| 03 | [Command injection → container escape](scenarios/03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | Apache log (100150/100151) + pfSense filterlog (100140/100141) | ⚠️ Partially detected; internal brute force is a blind spot |
+| 03 | [Command Injection → Docker Container Escape](scenarios/03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | Apache log (100150/100151) + pfSense filterlog (100140/100141) | ⚠️ Partially detected; internal brute force is a blind spot |
 
 **Continuous monitoring** (not tied to a single scenario):
 
@@ -129,7 +129,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 | 6 | Detection engineering / purple team | 🔄 In progress |
 | 7 | Documentation & portfolio | 🔄 In progress |
  
-Condensed build details: [docs/02-build-log.md](docs/02-build-log.md)
+Condensed build details: [docs/02-summarized-build-log.md](docs/02-summarized-build-log.md)
  
 ---
 
@@ -138,7 +138,7 @@ Condensed build details: [docs/02-build-log.md](docs/02-build-log.md)
 | Path | Contents |
 |---|---|
 | [docs/01-architecture.md](docs/01-architecture.md) | Network design, VLAN rationale, full tool stack |
-| [docs/02-build-log.md](docs/02-build-log.md) | Condensed Phase 1-5 build summary |
+| [docs/02-summarized-build-log.md](docs/02-summarized-build-log.md) | Condensed Phase 1-5 build summary |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Problems hit during the build, root causes, and fixes |
 | [scenarios/](scenarios/) | Per-attack write-ups: attack steps, detection, evidence, remediation |
 | [detections/](detections/) | Custom Wazuh rules and decoders, SOC dashboards |

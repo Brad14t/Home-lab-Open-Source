@@ -1,3 +1,10 @@
+# Attack Playbook — AS-REP Roasting (T1558.004)
+
+> **Perspective:** This document is written from the **attacker's** point of view.
+> It describes how the attack is carried out. It contains **no detection or defensive
+> content** — that lives in [`blue-team-analysis.md`](./blue-team-analysis.md), written
+> from the defender's point of view with no prior knowledge of what's here.
+
 ## Phase 1 — Recon: finding AS-REP-roastable accounts
 
 With `jcarter`'s credentials already in hand from the earlier compromise, the

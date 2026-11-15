@@ -1,4 +1,4 @@
-# Blue Team Analysis — AS-REP Roasting Detection
+# Blue Team Analysis — AS-REP Roasting (T1558.004)
 
 > **Perspective:** This document is written from the **defender's** point of
 > view. I had no prior knowledge of the attack described in

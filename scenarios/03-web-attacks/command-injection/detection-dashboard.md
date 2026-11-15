@@ -1,4 +1,4 @@
-# Wazuh Dashboard — Command Injection / Docker Escape Detection
+# Detection Dashboard — Command Injection → Docker Container Escape
 
 A four-panel Wazuh dashboard covering both detections built for this
 scenario: the Portainer brute-force correlation rule (`100140`/`100141`)

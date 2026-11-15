@@ -1,6 +1,4 @@
-<img width="946" height="469" alt="image" src="https://github.com/user-attachments/assets/96f4c96d-bf20-4ee0-a570-70d35938b6cb" />
-
-# Wazuh Dashboard — Detection Panels (AS-REP Roasting addition)
+# Detection Dashboard — AS-REP Roasting (T1558.004)
 
 This dashboard is a **running, combined view** across all detection rules
 built so far in this lab — it started with the Kerberoasting panels in
@@ -11,6 +9,8 @@ completed, so this single view grows into a full picture of what's actually
 being monitored across the lab.
 
 ## Panels
+
+<img width="946" height="469" alt="image" src="https://github.com/user-attachments/assets/96f4c96d-bf20-4ee0-a570-70d35938b6cb" />
 
 ### Kerberoasting - Alert Count / Kerberoasting - Targets & Users
 Covered in [Scenario 01's dashboard doc](../01-kerberoasting/detection-dashboard.md).

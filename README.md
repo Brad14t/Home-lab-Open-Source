@@ -14,7 +14,7 @@ A fully segmented, home-built security operations lab for practicing **detection
 
 ```mermaid
 flowchart TB
-    NET["☁ Internet / Cox<br/>192.168.0.1"]
+    NET["☁ Internet / ISP<br/>192.168.0.1"]
     MGMT["🖥 Management PC<br/>192.168.0.234"]
 
     NET --- FW
@@ -25,7 +25,7 @@ flowchart TB
     subgraph SEC["SECURITY VLAN · 10.0.20.0/24"]
         WAZUH["Wazuh SIEM<br/>.10"]
         SPLUNK["Splunk<br/>.11"]
-        DFIR-IRIS["DFIR-IRIS<br/>.12 / .13"]
+        IRIS["DFIR-IRIS<br/>.12 / .13"]
     end
 
     subgraph CORP["CORPORATE VLAN · 10.0.30.0/24"]
@@ -53,7 +53,7 @@ flowchart TB
     KALI -.scoped attacks.-> CORP
     CORP -.agents/logs.-> WAZUH
     VULN -.agent/IDS.-> WAZUH
-    WAZUH -.cases.-> HIVE
+    WAZUH -.cases.-> IRIS
 
     classDef sec fill:#0f2417,stroke:#3fb950,color:#56d364
     classDef corp fill:#241e10,stroke:#d29922,color:#e3b341
@@ -61,7 +61,7 @@ flowchart TB
     classDef atk fill:#2d1113,stroke:#f85149,color:#ff7b72
     classDef fw fill:#1c2128,stroke:#58a6ff,color:#79c0ff
 
-    class WAZUH,SPLUNK,HIVE sec
+    class WAZUH,SPLUNK,IRIS sec
     class DC1,DC2,WS corp
     class DOCKER,MSF vuln
     class KALI,NESSUS atk

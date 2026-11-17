@@ -270,7 +270,7 @@ I am isolating vul/attacker vlans from corp vlan.
 
 How I look at it:
 
-`SECURITY` (your tools: Wazuh, Splunk, TheHive) should be able to reach into every other VLAN (monitoring needs visibility everywhere)
+`SECURITY` (your tools: Wazuh, Splunk, TheHive, later replaced by DFIR-IRIS) should be able to reach into every other VLAN (monitoring needs visibility everywhere)
 
 `CORPORATE` should NOT be reachable from `VULNERABLE` or `ATTACKER` (this is the "protect the business" zone)
 

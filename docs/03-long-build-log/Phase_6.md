@@ -1,5 +1,7 @@
 # My Process
 
+> **Note:** this log records the build as it happened. Case management was originally TheHive + Cortex; it was later replaced by DFIR-IRIS on the same VMs (103/104), and DFIR-IRIS is what the scenarios use. References to TheHive below are kept as the historical record.
+
 # TheHive Tuning 
 
 Why: There’s already a ~1,650/day medium-alert flood; tune before adding anything new or TheHive drowns.

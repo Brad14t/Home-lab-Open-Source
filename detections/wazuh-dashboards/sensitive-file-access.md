@@ -1,4 +1,4 @@
-<!-- screenshot: full "SOC — Sensitive File Access" dashboard -->
+<img width="2122" height="1801" alt="10 0 20 10_app_dashboards (3)" src="https://github.com/user-attachments/assets/e717207f-4de5-4198-94ad-34ed0aadd12e" />
 
 # Wazuh Dashboard — SOC — Sensitive File Access
 

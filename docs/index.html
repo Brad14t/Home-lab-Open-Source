@@ -1,1 +1,635 @@
-https://claude.ai/artifact/3ZTc5tLiAc9rQxZ1nBktJP
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home SOC Lab — Brad's Detection Engineering Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Concept: purple team. Red is what the attacker did, blue is what the SOC saw, and the page is laid out as those two lanes. */
+:root{
+  --paper:#F5F3FC; --card:#FFFFFF; --ink:#1B1340; --ink2:#4A4370; --ink3:#857FA6;
+  --red:#F0503C; --red-t:#FFE6E1; --blue:#2B5BFF; --blue-t:#E2E9FF; --violet:#6B3FE0; --violet-t:#ECE6FD;
+  --rule:rgba(27,19,64,.14);
+  --disp:"Bricolage Grotesque","Geist",system-ui,sans-serif;
+  --body:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,Menlo,Consolas,monospace;
+  --stripe:repeating-linear-gradient(135deg,rgba(43,91,255,.3) 0 4px,transparent 4px 9px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+p{margin:0}
+h1,h2,h3{margin:0;font-family:var(--disp);text-wrap:balance}
+h2{font-size:clamp(2rem,4vw,3rem);font-weight:750;line-height:1.02;letter-spacing:-.025em}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:rgba(27,19,64,.07);padding:1px 5px;border-radius:4px}
+:focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.sec{padding-top:120px}
+.sec-head{display:grid;grid-template-columns:1fr auto;gap:16px 40px;align-items:end;margin-bottom:36px}
+.sec-head p{color:var(--ink2);max-width:60ch;margin-top:14px}
+.more{font-weight:500;font-size:.95rem;border-bottom:2px solid var(--ink);padding-bottom:2px;white-space:nowrap;transition:color .15s,border-color .15s}
+.more:hover{color:var(--violet);border-color:var(--violet)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(245,243,252,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--rule)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px;gap:20px}
+.brand{font:700 1.1rem var(--disp);letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.brand i{display:block;width:22px;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--red) 0 50%,var(--blue) 50%)}
+nav ul{list-style:none;margin:0;padding:0;display:flex;gap:26px;font-size:.92rem;font-weight:500}
+nav ul a{color:var(--ink2);padding:4px 0;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+nav ul a:hover{color:var(--ink);border-color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 22px;border-radius:10px;font-weight:600;font-size:.98rem;border:2px solid var(--ink);background:var(--ink);color:#fff;transition:background .15s,color .15s,border-color .15s;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--violet);border-color:var(--violet)}
+.btn.alt{background:transparent;color:var(--ink)}
+.btn.alt:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn svg{width:17px;height:17px}
+nav .btn{padding:8px 15px;font-size:.88rem}
+
+/* hero */
+.hero{padding-top:72px}
+.hero-top{display:grid;grid-template-columns:1.55fr 1fr;gap:48px;align-items:end}
+h1{font-size:clamp(2.7rem,6.3vw,5.4rem);font-weight:800;line-height:.96;letter-spacing:-.035em}
+.hero-top .side p{color:var(--ink2);font-size:1.1rem;line-height:1.55}
+.hero-top .side p b{color:var(--ink);font-weight:600}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+
+/* replay console */
+.console{margin-top:56px;background:var(--ink);color:#fff;border-radius:18px;padding:26px 28px 28px;position:relative}
+.c-head{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{font:600 .95rem var(--body);color:rgba(255,255,255,.7);background:rgba(255,255,255,.08);border:2px solid transparent;border-radius:9px;padding:9px 15px;cursor:pointer;transition:background .15s,color .15s}
+.tab span{font-family:var(--mono);font-weight:400;opacity:.6;margin-right:8px}
+.tab:hover{background:rgba(255,255,255,.16);color:#fff}
+.tab[aria-selected="true"]{background:#fff;color:var(--ink)}
+.replay{font:600 .9rem var(--body);color:#fff;background:transparent;border:2px solid rgba(255,255,255,.35);border-radius:9px;padding:8px 14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:border-color .15s,background .15s}
+.replay:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+.replay svg{width:14px;height:14px}
+.c-meta{margin-top:18px;font:400 .86rem var(--mono);color:rgba(255,255,255,.6)}
+.lanes{display:grid;grid-template-columns:34px 1fr 1fr;gap:10px 14px;margin-top:20px}
+.lane-h{font:700 1.05rem var(--disp);display:flex;align-items:center;gap:9px;padding-bottom:6px}
+.lane-h i{width:11px;height:11px;border-radius:50%}
+.lane-h small{font:400 .86rem var(--body);color:rgba(255,255,255,.6)}
+.n{font:400 .8rem var(--mono);color:rgba(255,255,255,.45);padding-top:15px;text-align:right}
+.cell{border-radius:10px;padding:13px 16px;font-size:.96rem;line-height:1.4;min-height:50px;display:flex;align-items:center;gap:12px;opacity:0;transform:translateY(8px);transition:opacity .35s ease,transform .35s ease}
+.cell.on{opacity:1;transform:none}
+.cell code{background:rgba(255,255,255,.14)}
+.r{background:rgba(240,80,60,.2);border-left:4px solid var(--red)}
+.r.none{background:transparent;border-left:4px solid rgba(255,255,255,.14);color:rgba(255,255,255,.5);font-style:italic}
+.b.hit{background:var(--blue);font-weight:500}
+.b.part{background:var(--stripe),rgba(43,91,255,.16);border-left:4px solid var(--blue)}
+.b.miss{border:2px dashed rgba(255,255,255,.26);color:rgba(255,255,255,.62)}
+.tag{font:500 .72rem var(--mono);padding:3px 8px;border-radius:5px;white-space:nowrap;flex:none}
+.hit .tag{background:#fff;color:var(--blue)}
+.part .tag{background:rgba(255,255,255,.16)}
+.miss .tag{border:1px solid rgba(255,255,255,.3)}
+.verdict{margin-top:22px;padding-top:22px;border-top:1px solid rgba(255,255,255,.16);display:grid;grid-template-columns:auto 1fr auto;gap:14px 24px;align-items:start;opacity:0;transition:opacity .4s ease}
+.verdict.on{opacity:1}
+.verdict .v{font:700 1.25rem var(--disp);white-space:nowrap}
+.verdict p{color:rgba(255,255,255,.8);font-size:.96rem;max-width:62ch}
+.verdict .links{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.verdict .links a{font-size:.86rem;font-weight:500;padding:6px 12px;border-radius:8px;border:1.5px solid rgba(255,255,255,.35);transition:background .15s,color .15s,border-color .15s}
+.verdict .links a:hover{background:#fff;color:var(--ink);border-color:#fff}
+
+/* figures */
+.figs{display:grid;grid-template-columns:repeat(6,1fr);margin-top:40px;border-top:2px solid var(--ink);border-bottom:1px solid var(--rule)}
+.fig{padding:22px 18px;border-left:1px solid var(--rule)}
+.fig:first-child{border-left:0;padding-left:0}
+.fig b{display:block;font:800 2.5rem/1 var(--disp);letter-spacing:-.03em}
+.fig span{display:block;font-size:.86rem;color:var(--ink2);line-height:1.35;margin-top:8px}
+
+/* status swatches: shared by legend, matrix and rule inventory */
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;flex:none}
+.sw.ok{background:var(--blue)}
+.sw.warn{background:var(--stripe),var(--blue-t);box-shadow:inset 0 0 0 1.5px var(--blue)}
+.sw.bad{background:var(--card);box-shadow:inset 0 0 0 2.5px var(--red)}
+.sw.idle{background:transparent;border:1.5px dashed var(--ink3)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 26px;margin-bottom:26px;font-size:.92rem;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:9px}
+
+/* matrix */
+.matrix{display:grid;grid-template-columns:1.6fr 1fr;gap:36px;align-items:start}
+.tactic{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:18px 0;border-top:1px solid var(--rule)}
+.tactic:first-child{border-top:2px solid var(--ink)}
+.tactic h3{font:700 1.05rem/1.2 var(--disp);padding-top:8px}
+.techs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.tech{text-align:left;display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:start;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--rule);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s,transform .15s}
+.tech .sw{margin-top:4px}
+.tech.s-ok{background:var(--blue-t);border-color:rgba(43,91,255,.3)}
+.tech.s-warn{background:linear-gradient(rgba(255,255,255,.7),rgba(255,255,255,.7)),var(--stripe);border-color:rgba(43,91,255,.3)}
+.tech.s-bad{background:var(--red-t);border-color:rgba(240,80,60,.45)}
+.tech.s-idle{background:transparent;border-style:dashed;border-color:var(--ink3)}
+.tech:hover{border-color:var(--ink);transform:translateY(-1px)}
+.tech[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.tech .id{display:block;font:400 .76rem var(--mono);color:var(--ink2)}
+.tech .nm{display:block;font-size:.9rem;font-weight:500;line-height:1.25;margin-top:1px}
+.detail{position:sticky;top:82px;background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:26px 28px;min-height:380px}
+.detail .id{font:400 .82rem var(--mono);color:var(--ink2)}
+.detail h3{font-size:1.7rem;font-weight:750;line-height:1.08;letter-spacing:-.02em;margin:6px 0 12px}
+.detail .st{display:inline-flex;align-items:center;gap:9px;font-size:.92rem;font-weight:500}
+.detail dl{display:grid;grid-template-columns:max-content 1fr;gap:12px 18px;margin:20px 0 0;font-size:.93rem;border-top:1px solid var(--rule);padding-top:18px}
+.detail dt{color:var(--ink3);font-weight:500}
+.detail dd{margin:0;color:var(--ink2);line-height:1.5}
+.detail dd.mono{color:var(--ink)}
+.detail a{font-weight:500;color:var(--ink);border-bottom:2px solid var(--violet);transition:color .15s}
+.detail a:hover{color:var(--violet)}
+.detail .hint{margin-top:18px;font-size:.82rem;color:var(--ink3)}
+
+/* capability rows */
+.rows{border-top:2px solid var(--ink)}
+.row{display:grid;grid-template-columns:270px 1fr 300px;gap:32px;padding:26px 14px;margin:0 -14px;border-bottom:1px solid var(--rule);border-radius:10px;transition:background .15s}
+.row:hover{background:var(--card)}
+.row h3{font-size:1.45rem;font-weight:700;line-height:1.1;letter-spacing:-.015em;transition:color .15s}
+.row:hover h3{color:var(--violet)}
+.row p{color:var(--ink2);font-size:.98rem}
+.row p b{color:var(--ink);font-weight:600}
+.kw{display:flex;flex-wrap:wrap;gap:6px;align-content:start}
+.kw span{font-size:.8rem;font-weight:500;padding:4px 10px;border-radius:6px;background:var(--violet-t);color:#4A2AA8}
+.kw em{flex-basis:100%;font:400 .82rem var(--mono);color:var(--ink3);font-style:normal;margin-top:8px}
+.row:hover .kw em{color:var(--violet)}
+
+/* network */
+.net{display:grid;grid-template-columns:1.5fr 1fr;gap:36px;align-items:center}
+.net-svg{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:24px}
+.net-svg svg{width:100%;height:auto;display:block}
+.net-svg text{font-family:var(--mono);fill:var(--ink);font-size:12px}
+.net-svg .zl{font-family:var(--disp);font-weight:700;font-size:14px}
+.net-svg .sm{font-size:10.5px;fill:var(--ink2)}
+.net-svg .zone rect{transition:stroke-width .15s}
+.net-svg .zone:hover rect{stroke-width:3}
+.stack{margin:0;border-top:2px solid var(--ink)}
+.stack div{display:grid;grid-template-columns:7rem 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule);font-size:.95rem}
+.stack dt{font-weight:600}
+.stack dd{margin:0;color:var(--ink2)}
+
+/* rule inventory */
+.blocks{display:grid;gap:12px;border-top:2px solid var(--ink);padding-top:22px}
+.blk{display:grid;grid-template-columns:8rem 1fr 17rem;gap:20px;align-items:center}
+.blk .rng{font:400 .86rem var(--mono);color:var(--ink2)}
+.blk .track{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.blk .track i{display:block;height:22px;border-radius:5px;transition:transform .15s;cursor:default}
+.blk .track i:hover{transform:scale(1.12)}
+.blk .track i.ok{background:var(--blue)}
+.blk .track i.warn{background:var(--stripe),var(--blue-t);box-shadow:inset 0 0 0 1.5px var(--blue)}
+.blk .track i.bad{background:var(--card);box-shadow:inset 0 0 0 2.5px var(--red)}
+.blk .track i.idle{border:1.5px dashed var(--ink3)}
+.blk .track i.e{background:rgba(27,19,64,.06)}
+.blk .what{font-weight:500}
+.blk-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;font-size:.88rem;color:var(--ink2);padding-top:16px;margin-top:8px;border-top:1px solid var(--rule)}
+.tip{position:fixed;z-index:60;pointer-events:none;padding:7px 11px;border-radius:7px;background:var(--ink);color:#fff;font-size:.8rem;font-weight:500;opacity:0;transform:translate(-50%,-100%);transition:opacity .12s;white-space:nowrap}
+.tip.on{opacity:1}
+
+/* habits */
+.habits{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.habit{border-top:4px solid var(--violet);padding-top:18px}
+.habit:nth-child(1){border-color:var(--red)}
+.habit:nth-child(4){border-color:var(--blue)}
+.habit h3{font-size:1.35rem;font-weight:700;line-height:1.12;letter-spacing:-.015em;margin-bottom:10px}
+.habit p{font-size:.95rem;color:var(--ink2)}
+.habit p b{color:var(--ink);font-weight:600}
+
+/* reading paths */
+.paths{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.path{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:28px;display:grid;gap:12px;align-content:start}
+.path .time{font:800 2.6rem/1 var(--disp);letter-spacing:-.03em}
+.path .why{font-size:1.05rem;font-weight:600;line-height:1.3}
+.path .ans{font-size:.93rem;color:var(--ink2);margin-top:-4px}
+.path ol{margin:8px -10px 0;padding:0;list-style:none;display:grid;gap:2px;counter-reset:s}
+.path li{counter-increment:s}
+.path li a{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:11px 10px;border-radius:9px;transition:background .15s}
+.path li a::before{content:counter(s);font:700 .86rem var(--disp);width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+.path li a:hover{background:var(--violet-t)}
+.path li a:hover::before{background:var(--violet)}
+.path li b{display:block;font-weight:600;font-size:.97rem}
+.path li span{display:block;color:var(--ink2);font-size:.86rem;line-height:1.45;margin-top:2px}
+.path .end{font-size:.88rem;color:var(--ink2);padding-top:14px;border-top:1px solid var(--rule)}
+.path .end b{color:var(--ink);font-weight:600}
+
+footer{margin-top:120px;background:var(--ink);color:#fff;padding:64px 0 56px}
+footer .wrap{display:grid;grid-template-columns:1fr auto;gap:28px 40px;align-items:end}
+footer h2{max-width:16ch}
+footer p{color:rgba(255,255,255,.65);font-size:.9rem;margin-top:16px;max-width:62ch}
+footer .btn{background:#fff;color:var(--ink);border-color:#fff}
+footer .btn:hover{background:var(--violet);color:#fff;border-color:var(--violet)}
+
+@media(prefers-reduced-motion:reduce){.cell,.verdict{transition:none}html{scroll-behavior:auto}}
+@media(max-width:980px){
+  .hero-top,.matrix,.net{grid-template-columns:1fr}.hero-top{gap:24px}
+  .detail{position:static;min-height:0}
+  .figs{grid-template-columns:repeat(3,1fr)}.fig:nth-child(4){border-left:0;padding-left:0}.fig:nth-child(n+4){border-top:1px solid var(--rule)}
+  .row{grid-template-columns:1fr 1fr}.row h3{grid-column:1/-1}
+  .habits,.paths{grid-template-columns:1fr 1fr}
+  .blk{grid-template-columns:7.5rem 1fr}.blk .what{grid-column:1/-1;margin-top:-6px}
+  .verdict{grid-template-columns:1fr}.verdict .links{justify-content:flex-start}
+  nav ul{display:none}
+}
+@media(max-width:640px){
+  body{font-size:16px}.wrap{padding:0 18px}.sec{padding-top:84px}
+  .sec-head{grid-template-columns:1fr}
+  .console{padding:20px 16px;border-radius:14px}
+  .lanes{grid-template-columns:22px 1fr}.lane-h.blue-h{display:none}.lanes .b{grid-column:2}.n{grid-row:span 2}
+  .figs{grid-template-columns:1fr 1fr}.fig,.fig:first-child,.fig:nth-child(4){border-left:0;padding-left:0;border-top:1px solid var(--rule)}.fig:nth-child(-n+2){border-top:0}
+  .tactic{grid-template-columns:1fr;gap:8px}
+  .row,.habits,.paths{grid-template-columns:1fr}
+  .stack div{grid-template-columns:1fr;gap:2px}.blk{grid-template-columns:1fr}
+  footer .wrap{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><i></i>Home SOC Lab</a>
+    <ul>
+      <li><a href="#replay">Replay</a></li>
+      <li><a href="#coverage">Coverage</a></li>
+      <li><a href="#work">The work</a></li>
+      <li><a href="#network">Network</a></li>
+      <li><a href="#rules">Rules</a></li>
+      <li><a href="#read">Start here</a></li>
+    </ul>
+    <a class="btn" href="https://github.com/Brad14t/Home-lab-Open-Source" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.9 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.3 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>GitHub repo</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-top">
+      <h1>I attack my own network, then write down what my SIEM missed.</h1>
+      <div class="side">
+        <p>A five-VLAN enterprise-style lab on one Proxmox host, built with free tools. I attack it from Kali, hunt the attack in Wazuh, work it as a DFIR-IRIS case and document every rule. <b>Gaps are written up as findings with root causes, not hidden.</b></p>
+        <div class="cta">
+          <a class="btn" href="https://github.com/Brad14t/Home-lab-Open-Source" target="_blank" rel="noopener">Open the repository</a>
+          <a class="btn alt" href="#read">Where to start reading</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="console" id="replay" aria-label="Scenario replay">
+      <div class="c-head">
+        <div class="tabs" role="tablist" id="tabs"></div>
+        <button class="replay" id="again" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Replay</button>
+      </div>
+      <div class="c-meta" id="cmeta"></div>
+      <div class="lanes" id="lanes" aria-live="polite"></div>
+      <div class="verdict" id="verdict"></div>
+    </div>
+
+    <div class="figs">
+      <div class="fig"><b>35</b><span>custom Wazuh rules, plus 2 custom decoders</span></div>
+      <div class="fig"><b>16</b><span>MITRE ATT&amp;CK techniques mapped to rules</span></div>
+      <div class="fig"><b>3</b><span>end-to-end purple-team scenarios</span></div>
+      <div class="fig"><b>54</b><span>build problems logged with root cause and fix</span></div>
+      <div class="fig"><b>13</b><span>VMs across 5 segmented VLANs</span></div>
+      <div class="fig"><b>2</b><span>SOC morning-review dashboards</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec" id="coverage">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2>ATT&amp;CK coverage, technique by technique</h2><p>16 techniques are mapped to rules. Hover one to see the rule, the log source, how it was proven and where it stops working. Click to pin it.</p></div>
+      <a class="more" href="https://github.com/Brad14t/Home-lab-Open-Source#detection-results" target="_blank" rel="noopener">Detection results in the README</a>
+    </div>
+    <div class="legend">
+      <span><i class="sw ok"></i>Detected, validated live</span>
+      <span><i class="sw warn"></i>Partial or blind spot</span>
+      <span><i class="sw bad"></i>Gap, root-caused</span>
+      <span><i class="sw idle"></i>Written, not yet validated</span>
+    </div>
+    <div class="matrix">
+      <div id="tactics"></div>
+      <aside class="detail" id="detail" aria-live="polite"></aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2>The daily work of a SOC analyst, done end to end</h2></div>
+      <a class="more" href="https://github.com/Brad14t/Home-lab-Open-Source#what-this-demonstrates" target="_blank" rel="noopener">What this demonstrates</a>
+    </div>
+    <div class="rows">
+      <a class="row" href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/detections/wazuh-local-rules/README.md" target="_blank" rel="noopener">
+        <h3>Detection engineering</h3>
+        <p>Custom Wazuh XML rules with parent chains, frequency correlation and regex tuning. Alerts are tuned <b>per rule, never by global threshold</b>. One rule went from 393 hits to 1 true positive, then was re-proved on live traffic.</p>
+        <div class="kw"><span>SIEM</span><span>Sysmon</span><span>auditd</span><span>4624 / 4625 / 4688</span><span>4768 / 4769</span><span>decoders</span><em>detections/wazuh-local-rules</em></div>
+      </a>
+      <a class="row" href="https://github.com/Brad14t/Home-lab-Open-Source/tree/main/scenarios" target="_blank" rel="noopener">
+        <h3>Purple teaming</h3>
+        <p>Real techniques run from Kali against AD and Docker targets, then hunted in the SIEM. Blue-team write-ups are done <b>without the attack playbook open</b>, so the detection story can't lean on knowing the answer.</p>
+        <div class="kw"><span>Kerberoasting</span><span>AS-REP roasting</span><span>command injection</span><span>container escape</span><span>threat hunting</span><em>scenarios/</em></div>
+      </a>
+      <a class="row" href="https://github.com/Brad14t/Home-lab-Open-Source/tree/main/detections/wazuh-dashboards" target="_blank" rel="noopener">
+        <h3>SOC operations and incident response</h3>
+        <p>SIEM, IDS, endpoint telemetry and case management as one pipeline. Every scenario becomes a <b>DFIR-IRIS case</b> with assets, IOCs, timeline and tasks. Two dashboards are built for a morning triage review.</p>
+        <div class="kw"><span>DFIR-IRIS</span><span>triage</span><span>IOCs</span><span>Suricata</span><span>dashboards</span><span>credential rotation</span><em>detections/wazuh-dashboards</em></div>
+      </a>
+      <a class="row" href="https://github.com/Brad14t/Home-lab-Open-Source/tree/main/firewall-rules" target="_blank" rel="noopener">
+        <h3>Network segmentation and Active Directory</h3>
+        <p>Five VLANs behind pfSense with <b>default-deny</b> rulesets and scoped temporary rules for testing. Two Server 2025 DCs, GPOs, a NIST 800-63B password policy, and deliberately roastable service accounts to exercise detections.</p>
+        <div class="kw"><span>pfSense</span><span>least privilege</span><span>Active Directory</span><span>GPO</span><span>NIST 800-63B</span><em>firewall-rules/</em></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="network">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2>Segmented zones, default-deny between them</h2><p>Telemetry flows one way into the SOC. The attacker VLAN is blocked from the corporate and security zones unless I open a scoped, temporary rule for a test.</p></div>
+      <a class="more" href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/docs/01-architecture.md" target="_blank" rel="noopener">Architecture doc</a>
+    </div>
+    <div class="net">
+      <div class="net-svg">
+        <svg viewBox="0 0 640 392" role="img" aria-label="Lab network: pfSense routes to SECURITY, CORPORATE, VULNERABLE and ATTACKER VLANs; agents and IDS send telemetry to Wazuh; the attacker VLAN attacks the vulnerable VLAN">
+          <defs>
+            <marker id="aK" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#857FA6"/></marker>
+            <marker id="aR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#F0503C"/></marker>
+            <marker id="aB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2B5BFF"/></marker>
+          </defs>
+          <g class="zone">
+            <rect x="185" y="10" width="270" height="58" rx="10" fill="#1B1340" stroke="#1B1340" stroke-width="1.5"/>
+            <text x="320" y="35" text-anchor="middle" class="zl" style="fill:#fff">pfSense, soc-fw-01</text>
+            <text x="320" y="54" text-anchor="middle" class="sm" style="fill:rgba(255,255,255,.7)">5 VLANs, default deny, Suricata IDS</text>
+          </g>
+          <g class="zone">
+            <rect x="20" y="118" width="270" height="110" rx="10" fill="#E2E9FF" stroke="#2B5BFF" stroke-width="1.5"/>
+            <text x="36" y="143" class="zl">SECURITY 10.0.20.0/24</text>
+            <text x="36" y="168">Wazuh SIEM .10</text>
+            <text x="36" y="188">Splunk .11</text>
+            <text x="36" y="208">DFIR-IRIS .12 / .13</text>
+          </g>
+          <g class="zone">
+            <rect x="350" y="118" width="270" height="110" rx="10" fill="#ECE6FD" stroke="#6B3FE0" stroke-width="1.5"/>
+            <text x="366" y="143" class="zl">CORPORATE 10.0.30.0/24</text>
+            <text x="366" y="168">DC01 .10, DC02 .11</text>
+            <text x="366" y="188">WS01 / WS02 (Win 11)</text>
+            <text x="366" y="208" class="sm">AD lab.local, Sysmon, Wazuh agents</text>
+          </g>
+          <g class="zone">
+            <rect x="20" y="268" width="270" height="110" rx="10" fill="#ECE6FD" stroke="#6B3FE0" stroke-width="1.5"/>
+            <text x="36" y="293" class="zl">VULNERABLE 10.0.40.0/24</text>
+            <text x="36" y="318">Docker host .10</text>
+            <text x="36" y="338" class="sm">DVWA, bWAPP, Portainer, auditd</text>
+            <text x="36" y="358">Metasploitable 2 .20</text>
+          </g>
+          <g class="zone">
+            <rect x="350" y="268" width="270" height="110" rx="10" fill="#FFE6E1" stroke="#F0503C" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <text x="366" y="293" class="zl">ATTACKER 10.0.50.0/24</text>
+            <text x="366" y="318">Kali + Caldera .10</text>
+            <text x="366" y="338">Nessus Essentials .11</text>
+            <text x="366" y="358" class="sm">blocked to CORP / SEC by default</text>
+          </g>
+          <line x1="290" y1="68" x2="165" y2="116" stroke="#857FA6" marker-end="url(#aK)"/>
+          <line x1="350" y1="68" x2="475" y2="116" stroke="#857FA6" marker-end="url(#aK)"/>
+          <text x="320" y="164" text-anchor="middle" class="sm">agents</text>
+          <line x1="348" y1="176" x2="292" y2="176" stroke="#2B5BFF" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#aB)"/>
+          <line x1="140" y1="266" x2="140" y2="230" stroke="#2B5BFF" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#aB)"/>
+          <text x="150" y="252" class="sm">agent + IDS</text>
+          <text x="320" y="312" text-anchor="middle" class="sm">attacks</text>
+          <line x1="348" y1="324" x2="292" y2="324" stroke="#F0503C" stroke-width="2.5" marker-end="url(#aR)"/>
+        </svg>
+      </div>
+      <dl class="stack">
+        <div><dt>Hypervisor</dt><dd>Proxmox VE on an HP Elite Mini 600 G9, 14 cores, 32 GB</dd></div>
+        <div><dt>SIEM</dt><dd>Wazuh (primary), Splunk</dd></div>
+        <div><dt>IDS</dt><dd>Suricata on pfSense, ET Open rules, scoped Home Net</dd></div>
+        <div><dt>Endpoint</dt><dd>Sysmon (sysmon-modular), Wazuh agents, auditd</dd></div>
+        <div><dt>Cases</dt><dd>DFIR-IRIS</dd></div>
+        <div><dt>Offense</dt><dd>Kali, MITRE Caldera, Nessus Essentials</dd></div>
+        <div><dt>Targets</dt><dd>AD service accounts, DVWA, bWAPP, Portainer, Metasploitable 2</dd></div>
+        <div><dt>Budget</dt><dd>$0 in software</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="rules">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2>Every rule, by ID block</h2><p>Rule IDs are allocated in blocks of ten per detection area. Each square is one rule, drawn with its validation status. Hover a square for the ID.</p></div>
+      <a class="more" href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/detections/README.md" target="_blank" rel="noopener">ID conventions</a>
+    </div>
+    <div class="blocks" id="blocks"></div>
+  </div>
+</section>
+
+<section class="sec" id="habits">
+  <div class="wrap">
+    <div class="sec-head"><div><h2>Habits you can check in the repo</h2></div></div>
+    <div class="habits">
+      <div class="habit"><h3>Failures are findings</h3><p>Scenario 01's rule fired in testing but <b>not on real remote traffic</b>. I root-caused it and shipped hunting as the compensating control.</p></div>
+      <div class="habit"><h3>Lessons carry forward</h3><p>The <code>::ffff:</code> lesson shaped Scenario 02's rule, which <b>worked first time live</b>. Scenario 03's blind spot became rules 100170–100173.</p></div>
+      <div class="habit"><h3>Alert before lockout</h3><p>Windows brute force alerts at <b>4 failures</b> because AD locks at 5, so the SOC sees it before the helpdesk ticket.</p></div>
+      <div class="habit"><h3>"Active" isn't "working"</h3><p>54 logged problems traced from symptom to cause to fix: rule shadowing, stale archives, a wrong agent name, escaped backslashes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="read">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2>Where to start reading</h2><p>Three routes through the repo, by how much time you have. Each one answers a question a hiring manager would ask and lists the files to open in order. They build on each other, so you can stop after any of them.</p></div>
+      <a class="more" href="https://github.com/Brad14t/Home-lab-Open-Source" target="_blank" rel="noopener">Browse the full repository</a>
+    </div>
+    <div class="paths">
+      <div class="path">
+        <div class="time">2 min</div>
+        <p class="why">Is this lab real, and does it match a SOC analyst role?</p>
+        <p class="ans">Skim the overview and one finished scenario to see the attack, detection and case loop.</p>
+        <ol>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/README.md" target="_blank" rel="noopener"><div><b>README.md</b><span>Network diagram, tool stack, and the detection-results table with every scenario's status.</span></div></a></li>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/scenarios/README.md" target="_blank" rel="noopener"><div><b>scenarios/README.md</b><span>The four-file template every scenario follows: playbook, blind analysis, dashboard, IRIS case.</span></div></a></li>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/scenarios/02-asrep-roasting/README.md" target="_blank" rel="noopener"><div><b>Scenario 02: AS-REP Roasting</b><span>The cleanest story: no coverage, then new rule 100132, which fired on the first live attack.</span></div></a></li>
+        </ol>
+        <p class="end"><b>You'll leave knowing</b> the lab exists, is segmented, and detections are proven on live traffic.</p>
+      </div>
+      <div class="path">
+        <div class="time">15 min</div>
+        <p class="why">How do I investigate when a detection doesn't fire?</p>
+        <p class="ans">Follow a failed rule to its root cause, then see how rules are designed, validated and tuned.</p>
+        <ol>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/scenarios/01-kerberoasting/blue-team-analysis.md" target="_blank" rel="noopener"><div><b>Scenario 01: blue-team analysis</b><span>A rule that passed testing but missed the real attack, traced to <code>::ffff:</code> client addresses.</span></div></a></li>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/detections/wazuh-local-rules/README.md" target="_blank" rel="noopener"><div><b>Wazuh rules README</b><span>All 35 rules: parent chains, design decisions, limitations, and live validation tables.</span></div></a></li>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/docs/troubleshooting.md" target="_blank" rel="noopener"><div><b>docs/troubleshooting.md</b><span>54 build problems as symptom, root cause and fix. Shows how I debug, not just what I built.</span></div></a></li>
+        </ol>
+        <p class="end"><b>You'll leave knowing</b> how I write, test and tune detections, and how I handle gaps.</p>
+      </div>
+      <div class="path">
+        <div class="time">Deep dive</div>
+        <p class="why">Could this person run detections in a production SOC?</p>
+        <p class="ans">Read the longest hunt end to end, then the dashboards and the segmentation everything is tested against.</p>
+        <ol>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/blob/main/scenarios/03-web-attacks/command-injection/blue-team-analysis.md" target="_blank" rel="noopener"><div><b>Scenario 03: blue-team analysis</b><span>Eight-step hunt from a web exploit through the host to a container escape, with the east-west blind spot called out.</span></div></a></li>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/tree/main/detections/wazuh-dashboards" target="_blank" rel="noopener"><div><b>SOC dashboards</b><span>Authentication Overview and Sensitive File Access: panel design, queries, scripted fields, and what they currently show.</span></div></a></li>
+          <li><a href="https://github.com/Brad14t/Home-lab-Open-Source/tree/main/firewall-rules" target="_blank" rel="noopener"><div><b>firewall-rules/</b><span>Per-VLAN pfSense rulesets and WAN rules: the default-deny boundaries the detections rely on.</span></div></a></li>
+        </ol>
+        <p class="end"><b>You'll leave knowing</b> how the whole pipeline fits together and where its limits are.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h2>The evidence is all in the repo.</h2>
+      <p>Next on the roadmap: Scenario 04 (credential access), DCSync (4662), Windows file-read auditing (4663, rule 100178). Figures on this page are from the repo as of 2026-11-16.</p>
+    </div>
+    <a class="btn" href="https://github.com/Brad14t/Home-lab-Open-Source" target="_blank" rel="noopener">github.com/Brad14t/Home-lab-Open-Source</a>
+  </div>
+</footer>
+
+<div class="tip" id="tip"></div>
+
+<script>
+const REPO = "https://github.com/Brad14t/Home-lab-Open-Source/";
+const GH = REPO + "blob/main/";
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- scenario replay ---------- */
+const TAG = { hit: "ALERT", part: "PARTIAL", miss: "NO ALERT" };
+const SC = [
+  { no: "01", name: "Kerberoasting", meta: "T1558.003, target svc-sql", v: "Gap, root-caused",
+    steps: [
+      ["SPN enumeration as <code>jcarter</code>", "miss", "Nothing fired"],
+      ["Ticket request via <code>klist get</code> (living off the land)", "miss", "Event 4769 is logged, but rules 100130 / 100131 stay silent"],
+      ["AES256 ticket returned; RC4 is disabled", "miss", "Nothing fired"],
+      [null, "part", "A manual hunt on event 4769 finds the request"]
+    ],
+    find: "The rule matched loopback test traffic but not remote clients, which Windows logs as IPv4-mapped IPv6 (<code>::ffff:</code>). Documented as a gap; hunting is the compensating control.",
+    links: [["Folder", REPO + "tree/main/scenarios/01-kerberoasting"], ["Blue-team analysis", GH + "scenarios/01-kerberoasting/blue-team-analysis.md"], ["IRIS case", GH + "scenarios/01-kerberoasting/incident-report.md"]] },
+  { no: "02", name: "AS-REP Roasting", meta: "T1558.004, target svc-backup", v: "Detected",
+    steps: [
+      ["LDAP enumeration for pre-auth-disabled accounts", "miss", "Nothing fired"],
+      ["AS-REP hash requested without the password", "hit", "Rule 100132 fires on live traffic: event 4768, <code>preAuthType 0</code>"],
+      ["Hash cracked offline", "miss", "Nothing fired"]
+    ],
+    find: "Wazuh had zero coverage. I designed rule 100132 around the Scenario 01 lesson and it fired on the first live attempt. Password rotated, case closed in IRIS.",
+    links: [["Folder", REPO + "tree/main/scenarios/02-asrep-roasting"], ["Blue-team analysis", GH + "scenarios/02-asrep-roasting/blue-team-analysis.md"], ["IRIS case", GH + "scenarios/02-asrep-roasting/incident-report.md"]] },
+  { no: "03", name: "Command injection to container escape", meta: "T1190, T1059.004, T1110, T1611, T1003.008", v: "Partially detected",
+    steps: [
+      ["DVWA command injection (CWE-78)", "part", "Rule 100151 fires, but Apache doesn't log the POST body"],
+      ["Reverse shell via <code>/dev/tcp</code>", "miss", "Nothing fired: no process visibility inside the container"],
+      ["Portainer brute force from inside the host", "part", "Blind spot: rule 100141 only sees traffic that crosses pfSense"],
+      ["Privileged container, host root mounted", "miss", "Nothing fired at the time. Rule 100173 was built afterwards"],
+      ["<code>/etc/shadow</code> read", "miss", "Nothing fired at the time. Rule 100170 was built afterwards"]
+    ],
+    find: "The brute-force rule only sees traffic that crosses pfSense, so an attack from the same host is invisible east-west. Later closed in part by auditd rules 100170–100173.",
+    links: [["Folder", REPO + "tree/main/scenarios/03-web-attacks/command-injection"], ["Attack playbook", GH + "scenarios/03-web-attacks/command-injection/attack-playbook.md"], ["Blue-team analysis", GH + "scenarios/03-web-attacks/command-injection/blue-team-analysis.md"]] }
+];
+const tabsEl = document.getElementById("tabs"), lanesEl = document.getElementById("lanes"), metaEl = document.getElementById("cmeta"), vEl = document.getElementById("verdict");
+let curSc = 1, timers = [];
+tabsEl.innerHTML = SC.map((s, i) => `<button class="tab" role="tab" type="button" data-i="${i}" aria-selected="false"><span>${s.no}</span>${s.name}</button>`).join("");
+tabsEl.addEventListener("click", e => { const b = e.target.closest(".tab"); if (b) play(+b.dataset.i); });
+document.getElementById("again").addEventListener("click", () => play(curSc));
+function play(i) {
+  timers.forEach(clearTimeout); timers = []; curSc = i;
+  const s = SC[i];
+  tabsEl.querySelectorAll(".tab").forEach((b, j) => b.setAttribute("aria-selected", j === i));
+  metaEl.textContent = s.meta;
+  lanesEl.innerHTML = `<span></span><div class="lane-h"><i style="background:var(--red)"></i>Red team <small>what I ran</small></div><div class="lane-h blue-h"><i style="background:var(--blue)"></i>Blue team <small>what the SIEM did</small></div>` +
+    s.steps.map(([r, k, b], n) => `<span class="n">${n + 1}</span><div class="cell r${r ? "" : " none"}">${r || "No attacker action. The defender goes looking."}</div><div class="cell b ${k}"><span class="tag">${TAG[k]}</span><span>${b}</span></div>`).join("");
+  vEl.classList.remove("on");
+  vEl.innerHTML = `<div class="v">${s.v}</div><p>${s.find}</p><div class="links">${s.links.map(([l, u]) => `<a href="${u}" target="_blank" rel="noopener">${l}</a>`).join("")}</div>`;
+  const cells = [...lanesEl.querySelectorAll(".cell")];
+  if (reduce) { cells.forEach(c => c.classList.add("on")); vEl.classList.add("on"); return; }
+  cells.forEach((c, n) => timers.push(setTimeout(() => c.classList.add("on"), 250 + Math.floor(n / 2) * 850 + (n % 2) * 380)));
+  timers.push(setTimeout(() => vEl.classList.add("on"), 250 + s.steps.length * 850 + 200));
+}
+play(1);
+
+/* ---------- ATT&CK matrix ---------- */
+const S = { ok: "Detected, validated live", warn: "Partial or blind spot", bad: "Gap, root-caused", idle: "Written, not yet validated" };
+const tactics = [
+  { name: "Initial Access", techs: [
+    { id: "T1190", nm: "Exploit Public-Facing Application", s: "warn", rule: "100150 / 100151", src: "DVWA Apache access log", proof: "Fires on every POST to the command-injection endpoint (Scenario 03).", limit: "Apache doesn't log POST bodies, so a benign test and a reverse-shell payload look the same.", doc: "scenarios/03-web-attacks/command-injection/README.md" },
+    { id: "T1078.002", nm: "Valid Accounts: Domain", s: "ok", rule: "100160, 100163, 100168", src: "Windows 4624", proof: "Human-account logons and svc-* interactive logons validated live.", limit: "100168 (logon from the ATTACKER VLAN) waits on Scenario 04 for a live test.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1078.003", nm: "Valid Accounts: Local", s: "ok", rule: "100164, 100169", src: "Linux journald (sshd, PAM)", proof: "Exactly one alert per SSH or console login, including from Kali.", limit: "Only vuln-docker-01 has a Linux agent.", doc: "detections/wazuh-local-rules/README.md" }
+  ]},
+  { name: "Execution", techs: [
+    { id: "T1059.004", nm: "Unix Shell", s: "bad", rule: "None", src: "None captured", proof: "The /dev/tcp reverse shell in Scenario 03 left no log in any source.", limit: "No process-level visibility inside the container at the time.", doc: "scenarios/03-web-attacks/command-injection/blue-team-analysis.md" }
+  ]},
+  { name: "Persistence", techs: [
+    { id: "T1098.004", nm: "SSH Authorized Keys", s: "ok", rule: "100171", src: "auditd key sens_ssh", proof: "Validated in the sensitive-file build.", limit: "Watches cover root and docker_user01 only.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1053.003", nm: "Cron", s: "ok", rule: "100171", src: "auditd key sens_persist", proof: "Validated in the sensitive-file build.", limit: "Covers /etc/crontab and /etc/cron.d, not per-user crontabs.", doc: "detections/wazuh-local-rules/README.md" }
+  ]},
+  { name: "Privilege Escalation", techs: [
+    { id: "T1548.003", nm: "Sudo and Sudo Caching", s: "ok", rule: "100166, 100171", src: "journald sudo, auditd sens_priv", proof: "sudo to root captured with user and command; sudoers changes alert.", limit: "Linux only.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1611", nm: "Escape to Host", s: "ok", rule: "100173", src: "auditd mount syscall", proof: "A tmpfs mount fires; 392 of 393 systemd false positives tuned out by rule.", limit: "Was a full gap in Scenario 03. systemd is excluded; snapd loop mounts still alert.", doc: "detections/wazuh-local-rules/README.md" }
+  ]},
+  { name: "Credential Access", techs: [
+    { id: "T1558.003", nm: "Kerberoasting", s: "bad", rule: "100130 / 100131", src: "Windows 4769", proof: "The rule fired for loopback tests but never for the real remote attack.", limit: "Root cause: IPv4-mapped IPv6 (::ffff:) client addresses. Compensating control is hunting.", doc: "scenarios/01-kerberoasting/blue-team-analysis.md" },
+    { id: "T1558.004", nm: "AS-REP Roasting", s: "ok", rule: "100132", src: "Windows 4768, preAuthType 0", proof: "Fired on the live attack on the first attempt.", limit: "The vulnerable account is left in place on purpose and tracked in IRIS.", doc: "scenarios/02-asrep-roasting/blue-team-analysis.md" },
+    { id: "T1110", nm: "Brute Force", s: "warn", rule: "100141, 100161, 100165", src: "pfSense filterlog, 4625, journald", proof: "Logon failures detected on Windows and Linux.", limit: "Portainer brute force is only seen when it crosses pfSense; from inside the host it is invisible.", doc: "scenarios/03-web-attacks/command-injection/blue-team-analysis.md" },
+    { id: "T1110.001", nm: "Password Guessing", s: "ok", rule: "100162, 100167", src: "Frequency on 4625 and journald", proof: "Windows fires at 4 failures, before the AD lockout at 5. Linux fires at 5 from one IP.", limit: "Per-username counting won't catch password spraying.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1003.001", nm: "LSASS Memory", s: "idle", rule: "100177 + built-in 92900", src: "Sysmon event 10", proof: "Sysmon logged no event for a benign lsass handle open.", limit: "Unvalidated until Scenario 04 runs a real dump technique.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1003.002", nm: "Security Account Manager", s: "ok", rule: "100176 + built-in 92026", src: "Sysmon event 1", proof: "reg save of SAM, SYSTEM and SECURITY fired on WS01 and DC01.", limit: "Matches the tool name; a renamed reg.exe would evade it.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1003.003", nm: "NTDS", s: "ok", rule: "100174, 100175", src: "Sysmon event 1, Security 4688", proof: "vssadmin and esentutl on WS01; ntdsutil on DC01 via 4688 because Sysmon didn't log it.", limit: "WMI or PowerShell shadow copies evade it. No DCSync rule yet.", doc: "detections/wazuh-local-rules/README.md" },
+    { id: "T1003.008", nm: "/etc/passwd and /etc/shadow", s: "ok", rule: "100170", src: "auditd key sens_shadow", proof: "cat /etc/shadow fires; expected readers like sudo and sshd are excluded.", limit: "Was undetected in Scenario 03. systemd and the Wazuh binary are excluded.", doc: "detections/wazuh-local-rules/README.md" }
+  ]}
+];
+const tEl = document.getElementById("tactics"), dEl = document.getElementById("detail"), all = [];
+let cur = null, pinned = false;
+tactics.forEach(t => {
+  const box = document.createElement("div"); box.className = "tactic";
+  box.innerHTML = `<h3>${t.name}</h3>`;
+  const inner = document.createElement("div"); inner.className = "techs";
+  t.techs.forEach(x => {
+    x.tactic = t.name;
+    const b = document.createElement("button"); b.type = "button"; b.className = "tech s-" + x.s; b.setAttribute("aria-pressed", "false");
+    b.innerHTML = `<i class="sw ${x.s}"></i><span><span class="id">${x.id}</span><span class="nm">${x.nm}</span></span>`;
+    b.addEventListener("click", () => select(x, true));
+    b.addEventListener("mouseenter", () => { if (!pinned) render(x); });
+    b.addEventListener("mouseleave", () => { if (!pinned && cur) render(cur); });
+    x.btn = b; all.push(x); inner.appendChild(b);
+  });
+  box.appendChild(inner); tEl.appendChild(box);
+});
+function render(x) {
+  dEl.innerHTML = `<span class="id">${x.id}, ${x.tactic}</span><h3>${x.nm}</h3><span class="st"><i class="sw ${x.s}"></i>${S[x.s]}</span>
+  <dl><dt>Rule</dt><dd class="mono">${x.rule}</dd><dt>Source</dt><dd>${x.src}</dd><dt>Proof</dt><dd>${x.proof}</dd><dt>Limit</dt><dd>${x.limit}</dd>
+  <dt>Read</dt><dd><a href="${GH + x.doc}" target="_blank" rel="noopener">${x.doc.split("/").slice(-2).join("/")}</a></dd></dl>
+  <p class="hint">${pinned && cur === x ? "Pinned. Click another technique to switch." : "Hover to preview, click to pin."}</p>`;
+}
+function select(x, pin) {
+  all.forEach(y => y.btn.setAttribute("aria-pressed", "false")); x.btn.setAttribute("aria-pressed", "true");
+  cur = x; pinned = pin; render(x);
+}
+select(all.find(x => x.id === "T1558.003"), false);
+
+/* ---------- rule inventory ---------- */
+const blocks = [
+  ["100100–103", "Noise tuning", [["100100","ok"],["100101","ok"],["100102","ok"],["100103","ok"]]],
+  ["100110–112", "pfSense Suricata", [["100110","ok"],["100111","ok"],["100112","ok"]]],
+  ["100120–122", "pfSense firewall blocks", [["100120","ok"],["100121","ok"],["100122","ok"]]],
+  ["100130–132", "Kerberos attacks", [["100130","bad"],["100131","bad"],["100132","ok"]]],
+  ["100140–141", "Portainer brute force", [["100140","ok"],["100141","warn"]]],
+  ["100150–151", "DVWA command injection", [["100150","ok"],["100151","warn"]]],
+  ["100160–169", "Authentication", [["100160","ok"],["100161","ok"],["100162","ok"],["100163","ok"],["100164","ok"],["100165","ok"],["100166","ok"],["100167","ok"],["100168","idle"],["100169","ok"]]],
+  ["100170–177", "Sensitive files and credential dumping", [["100170","ok"],["100171","ok"],["100172","ok"],["100173","ok"],["100174","ok"],["100175","ok"],["100176","ok"],["100177","idle"]]]
+];
+document.getElementById("blocks").innerHTML = blocks.map(([r, w, st]) => {
+  const segs = st.map(([id, s]) => `<i class="${s}" data-tip="${id}: ${S[s]}"></i>`).join("") + Array(10 - st.length).fill('<i class="e" data-tip="Free ID"></i>').join("");
+  return `<div class="blk"><span class="rng">${r}</span><span class="track" role="img" aria-label="${st.length} rules">${segs}</span><span class="what">${w}</span></div>`;
+}).join("") + `<div class="blk-foot"><span>35 rules built. Each block holds 10. Next reserved ID is 100178, for Windows 4663 file reads.</span><span>Built-in rules also used: 92026, 92900</span></div>`;
+
+const tip = document.getElementById("tip");
+document.addEventListener("mouseover", e => { const t = e.target.closest("[data-tip]"); if (!t) return; tip.textContent = t.dataset.tip; tip.classList.add("on"); });
+document.addEventListener("mousemove", e => { if (tip.classList.contains("on")) { tip.style.left = e.clientX + "px"; tip.style.top = (e.clientY - 12) + "px"; } });
+document.addEventListener("mouseout", e => { if (e.target.closest("[data-tip]")) tip.classList.remove("on"); });
+</script>
+</body>
+</html>

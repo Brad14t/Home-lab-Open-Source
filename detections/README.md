@@ -4,8 +4,8 @@ Custom detection content built for this lab. Every rule here was validated again
 
 | Folder | Contents |
 |---|---|
-| [wazuh-dashboards/](wazuh-dashboards/) | Cross-scenario SOC dashboards: [SOC — Authentication Overview](wazuh-dashboards/authentication-overview.md) (panels, queries, scripted fields) |
-| [wazuh-local-rules/](wazuh-local-rules/) | All custom Wazuh rules (`100100`–`100169`) and decoders: ID, level, MITRE mapping, log source, parent rules, validation status and known limitations |
+| [wazuh-dashboards/](wazuh-dashboards/) | Cross-scenario SOC dashboards: [SOC — Authentication Overview](wazuh-dashboards/authentication-overview.md) and [SOC — Sensitive File Access](wazuh-dashboards/sensitive-file-access.md) (panels, queries, scripted fields); see the [folder README](wazuh-dashboards/README.md) for shared conventions |
+| [wazuh-local-rules/](wazuh-local-rules/) | All custom Wazuh rules (`100100`–`100177`) and decoders: ID, level, MITRE mapping, log source, parent rules, validation status and known limitations |
 
 ## Rule ID blocks
 
@@ -20,7 +20,8 @@ Rules are allocated in blocks of 10 per detection area, so related rules stay to
 | `100140`–`100141` | Portainer brute force | [Scenario 03](../scenarios/03-web-attacks/command-injection/) |
 | `100150`–`100151` | DVWA command injection | [Scenario 03](../scenarios/03-web-attacks/command-injection/) |
 | `100160`–`100169` | Authentication monitoring (Windows + Linux logons, failures, brute force, sudo, logons from the ATTACKER VLAN) | SOC Authentication Overview dashboard |
-| `100170`+ | **Next free block:** sensitive file access (planned) | — |
+| `100170`–`100179` | Sensitive file access and credential dumping (`100170`–`100177` built, `100178` planned for Windows 4663 file reads) | SOC Sensitive File Access dashboard |
+| `100180`+ | **Next free block** | — |
 
 ## Dashboards
 
@@ -28,7 +29,7 @@ Rules are allocated in blocks of 10 per detection area, so related rules stay to
 |---|---|---|
 | Scenario detection panels | One block per scenario | `detection-dashboard.md` in each [scenario folder](../scenarios/) |
 | SOC — Authentication Overview | `100160`–`100169` | [wazuh-dashboards/authentication-overview.md](wazuh-dashboards/authentication-overview.md) |
-| SOC — Sensitive File Access | `100170`+ | Planned |
+| SOC — Sensitive File Access | `100170`–`100177` + built-ins `92026`, `92900` | [wazuh-dashboards/sensitive-file-access.md](wazuh-dashboards/sensitive-file-access.md) |
 
 ## Conventions
 

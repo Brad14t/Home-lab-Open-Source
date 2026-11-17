@@ -112,6 +112,7 @@ Each scenario runs a real attack technique, then verifies the detection. Full wr
 | Area | MITRE ATT&CK | Detection source | Status |
 |---|---|---|---|
 | [Authentication monitoring](detections/wazuh-dashboards/authentication-overview.md): logons, failures, brute force, service-account and ATTACKER-VLAN logons, sudo | T1078.002, T1078.003, T1110, T1110.001, T1548.003 | Windows 4624/4625 + Linux journald (sshd, PAM, sudo), rules 100160–100169 | ✅ Detected (100168 pending Scenario 04) |
+| [Sensitive file access and credential dumping](detections/wazuh-dashboards/sensitive-file-access.md): `/etc/shadow` reads, sudoers/SSH/cron changes, Docker CLI, container-escape mounts, `reg save`, `ntdsutil`, `vssadmin`, `esentutl`, lsass access | T1003.001, T1003.002, T1003.003, T1003.008, T1098.004, T1053.003, T1548.003, T1611 | Linux auditd + Windows Sysmon (events 1, 10) and Security 4688, rules 100170–100177 + built-ins 92026, 92900 | ⚠️ Mostly detected and validated live; lsass (100177) is unvalidated and Windows file reads (4663) are not covered yet |
 
 <!-- Update Status to ✅ Detected and add a "Time to detect" column as each scenario completes -->
  

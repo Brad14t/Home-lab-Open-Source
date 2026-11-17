@@ -14,7 +14,7 @@ pfSense firewall with five VLANs, segmentation rulesets, and hardware offloading
 
 ## Phase 2 — Security Monitoring
 
-Wazuh all-in-one (manager, indexer, dashboard), Splunk, and TheHive + Cortex (split across a data VM and an app VM). Custom Wazuh → TheHive integration for alert-to-case forwarding.
+Wazuh all-in-one (manager, indexer, dashboard), Splunk, and case management. Case management was first built as TheHive + Cortex (split across a data VM and an app VM, with a custom Wazuh → TheHive integration for alert-to-case forwarding). It was later replaced by **DFIR-IRIS** on the same two VMs (103/104), which is the case platform used in every scenario.
 
 **Key outcomes:** working SIEM, case management pipeline.
 

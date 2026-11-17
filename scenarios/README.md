@@ -3,11 +3,11 @@
 Each scenario runs a real attack technique against the lab, then verifies and
 documents the detection. All follow the same structure — see [Files in each scenario](#files-in-each-scenario) below.
 
-| # | Scenario | MITRE ATT&CK | Status |
+| # | Scenario | MITRE ATT&CK | Status (write-up · detection) |
 |---|---|---|---|
-| 01 | [Kerberoasting](01-kerberoasting/) | T1558.003 | ✅ Complete |
-| 02 | [AS-REP Roasting](02-asrep-roasting/) | T1558.004 | ✅ Complete |
-| 03 | [Command Injection → Docker Container Escape](03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | ✅ Complete |
+| 01 | [Kerberoasting](01-kerberoasting/) | T1558.003 | ✅ Complete · ⚠️ detection gap documented (hunting is the compensating control) |
+| 02 | [AS-REP Roasting](02-asrep-roasting/) | T1558.004 | ✅ Complete · ✅ detected on live traffic |
+| 03 | [Command Injection → Docker Container Escape](03-web-attacks/command-injection/) | T1190, T1059.004, T1110, T1611, T1003.008 | ✅ Complete · ⚠️ partially detected (blind spots documented) |
 
 ## Files in each scenario
 

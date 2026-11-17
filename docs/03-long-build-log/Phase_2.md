@@ -1,5 +1,7 @@
 # My Process 
 
+> **Note:** this log records the build as it happened. Case management was originally TheHive + Cortex; it was later replaced by DFIR-IRIS on the same VMs (103/104), and DFIR-IRIS is what the scenarios use. References to TheHive below are kept as the historical record.
+
 #  Installing Wazuh
 
 I already have the ISO ready to go. So I go to `Datacenter` -> Right click `pve01` -> `Add VM`

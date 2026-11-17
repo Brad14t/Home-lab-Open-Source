@@ -1,8 +1,10 @@
-# Network Design & Architecture
+# Network Design & Architecture (original plan)
+
+> **Note:** this is the original design plan, kept for reference. The lab as built differs: there is no separate Management VLAN (the management PC reaches the lab through pfSense WAN rules), and case management is DFIR-IRIS (10.0.20.12/.13) rather than TheHive and Cortex. For the current design see [docs/01-architecture.md](docs/01-architecture.md) and the [root README](README.md).
 
 # Overview
 
-This document details the complete network architecture for the Ultimate Blue Team Cybersecurity Lab. The design emphasizes network segmentation, security monitoring visibility, and realistic enterprise topology.
+This document details the planned network architecture for the home SOC lab. The design emphasizes network segmentation, security monitoring visibility, and realistic enterprise topology.
 
 # Design Principles
 
